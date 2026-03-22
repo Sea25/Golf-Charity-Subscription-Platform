@@ -49,6 +49,8 @@ export async function addScore(formData) {
 
   // Refresh the path to show the new list of scores
   revalidatePath('/scores')
+
+  
   
   return { success: true }
 >>>>>>> 439dc91c3d863ceacfe4d48f68c76629aefb2f4c
