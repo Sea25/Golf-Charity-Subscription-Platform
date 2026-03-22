@@ -1,0 +1,440 @@
+
+> golf-charity-subscription-platform@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.131:3000
+- Environments: .env.local
+✓ Ready in 726ms
+
+[browser] ./src/app/layout.js:1:1
+Module not found: Can't resolve '@/context/AuthContext'
+> 1 | import { AuthProvider } from '@/context/AuthContext'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  2 | import './globals.css'
+  3 |
+  4 | export const metadata = {
+
+Import map: aliased to relative './context/AuthContext' inside of [project]/
+
+https://nextjs.org/docs/messages/module-not-found 
+[browser] ./src/app/layout.js:1:1
+Module not found: Can't resolve '@/context/AuthContext'
+> 1 | import { AuthProvider } from '@/context/AuthContext'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  2 | import './globals.css'
+  3 |
+  4 | export const metadata = {
+
+Import map: aliased to relative './context/AuthContext' inside of [project]/
+
+https://nextjs.org/docs/messages/module-not-found 
+[browser] ./src/app/layout.js:1:1
+Module not found: Can't resolve '@/context/AuthContext'
+> 1 | import { AuthProvider } from '@/context/AuthContext'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  2 | import './globals.css'
+  3 |
+  4 | export const metadata = {
+
+Import map: aliased to relative './context/AuthContext' inside of [project]/
+
+https://nextjs.org/docs/messages/module-not-found 
+[browser] ./src/app/layout.js:1:1
+Module not found: Can't resolve '@/context/AuthContext'
+> 1 | import { AuthProvider } from '@/context/AuthContext'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  2 | import './globals.css'
+  3 |
+  4 | export const metadata = {
+
+Import map: aliased to relative './context/AuthContext' inside of [project]/
+
+https://nextjs.org/docs/messages/module-not-found 
+[browser] ./src/app/layout.js:1:1
+Module not found: Can't resolve '@/context/AuthContext'
+> 1 | import { AuthProvider } from '@/context/AuthContext'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  2 | import './globals.css'
+  3 |
+  4 | export const metadata = {
+
+Import map: aliased to relative './context/AuthContext' inside of [project]/
+
+https://nextjs.org/docs/messages/module-not-found 
+[browser] ./src/app/layout.js:1:1
+Module not found: Can't resolve '@/context/AuthContext'
+> 1 | import { AuthProvider } from '@/context/AuthContext'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  2 | import './globals.css'
+  3 |
+  4 | export const metadata = {
+
+Import map: aliased to relative './context/AuthContext' inside of [project]/
+
+https://nextjs.org/docs/messages/module-not-found 
+[browser] ./src/app/layout.js:1:1
+Module not found: Can't resolve '@/context/AuthContext'
+> 1 | import { AuthProvider } from '@/context/AuthContext'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  2 | import './globals.css'
+  3 |
+  4 | export const metadata = {
+
+Import map: aliased to relative './context/AuthContext' inside of [project]/
+
+https://nextjs.org/docs/messages/module-not-found 
+⨯ ./src/app/layout.js:1:1
+Module not found: Can't resolve '@/context/AuthContext'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mAuthProvider[0m } [36mfrom[0m [32m'@/context/AuthContext'[0m
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m [36mimport[0m [32m'./globals.css'[0m
+  [90m3 |[0m
+  [90m4 |[0m [36mexport[0m [36mconst[0m metadata = {
+
+Import map: aliased to relative './context/AuthContext' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ GET / 500 in 741ms (next.js: 537ms, application-code: 203ms)
+[browser] Uncaught Error: ./src/app/layout.js:1:1
+Module not found: Can't resolve '@/context/AuthContext'
+> 1 | import { AuthProvider } from '@/context/AuthContext'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  2 | import './globals.css'
+  3 |
+  4 | export const metadata = {
+
+Import map: aliased to relative './context/AuthContext' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (Error: ./src/app/layout.js:1:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (Error: (./src/app/layout.js:1:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+ GET / 200 in 3.5s (next.js: 1111ms, application-code: 2.3s)
+ GET / 200 in 211ms (next.js: 44ms, application-code: 167ms)
+✓ Compiled in 1867ms
+✓ Compiled in 2.3s
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames {
+  page: '/'
+}
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames {
+  page: '/'
+}
+ GET / 500 in 3.0s (next.js: 2.1s, application-code: 906ms)
+✓ Compiled in 0ms
+ GET / 500 in 987ms (next.js: 9ms, application-code: 978ms)
+ GET / 200 in 365ms (next.js: 100ms, application-code: 265ms)
+ GET / 200 in 364ms (next.js: 128ms, application-code: 237ms)
+ GET / 200 in 42ms (next.js: 4ms, application-code: 38ms)
+ GET /how-it-works 404 in 1008ms (next.js: 964ms, application-code: 44ms)
+ GET /charities 404 in 38ms (next.js: 7ms, application-code: 31ms)
+ GET /how-it-works 404 in 125ms (next.js: 12ms, application-code: 113ms)
+ GET /charities 404 in 58ms (next.js: 9ms, application-code: 49ms)
+✓ Compiled in 1921ms
+[browser] Uncaught Error: Internal Next.js error: Router action dispatched before initialization.
+[browser] Uncaught Error: Internal Next.js error: Router action dispatched before initialization.
+[browser] Uncaught Error: Internal Next.js error: Router action dispatched before initialization.
+[browser] Uncaught Error: Internal Next.js error: Router action dispatched before initialization.
+ GET / 200 in 2.1s (next.js: 1818ms, application-code: 245ms)
+ GET /golf_hero_bg.png 404 in 96ms (next.js: 26ms, application-code: 70ms)
+⨯ The requested resource isn't a valid image for /golf_hero_bg.png received null
+ GET / 200 in 69ms (next.js: 4ms, application-code: 65ms)
+⨯ The requested resource isn't a valid image for /golf_hero_bg.png received null
+ GET / 200 in 105ms (next.js: 7ms, application-code: 98ms)
+⨯ The requested resource isn't a valid image for /golf_hero_bg.png received null
+ GET / 200 in 52ms (next.js: 5ms, application-code: 46ms)
+✓ Compiled in 242ms
+ GET / 200 in 230ms (next.js: 142ms, application-code: 87ms)
+ GET / 200 in 57ms (next.js: 7ms, application-code: 50ms)
+ GET / 200 in 36ms (next.js: 9ms, application-code: 28ms)
+ GET / 200 in 40ms (next.js: 7ms, application-code: 33ms)
+✓ Compiled in 95ms
+ GET / 200 in 302ms (next.js: 92ms, application-code: 210ms)
+✓ Compiled in 165ms
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames {
+  page: '/'
+}
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames {
+  page: '/'
+}
+ GET / 500 in 3.7s (next.js: 2.8s, application-code: 827ms)
+ GET / 500 in 937ms (next.js: 892ms, application-code: 46ms)
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames {
+  page: '/'
+}
+ GET / 500 in 745ms (next.js: 733ms, application-code: 12ms)
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames {
+  page: '/'
+}
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames {
+  page: '/'
+}
+ GET / 500 in 1417ms (next.js: 1394ms, application-code: 24ms)
+ GET / 500 in 1396ms (next.js: 1383ms, application-code: 13ms)
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames {
+  page: '/'
+}
+ GET / 500 in 901ms (next.js: 94ms, application-code: 808ms)
+[browser] Uncaught Error: The default export is not a React Component in "/page"
+✓ Compiled in 1892ms
+ GET / 200 in 335ms (next.js: 131ms, application-code: 204ms)
+ GET /signup 200 in 2.8s (next.js: 2.7s, application-code: 26ms)
+✓ Compiled in 91ms
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames {
+  page: '/'
+}
+⨯ ./src/app/page.js:1:1
+Expression expected
+[31m[1m>[0m [90m1 |[0m }
+  [90m  |[0m [31m[1m^[0m
+  [90m2 |[0m
+
+Parsing ecmascript source code failed
+
+
+ GET / 500 in 2.6s (next.js: 2.3s, application-code: 201ms)
+ GET / 500 in 337ms (next.js: 282ms, application-code: 55ms)
+⨯ ./src/app/page.js:1:1
+Expression expected
+[31m[1m>[0m [90m1 |[0m }
+  [90m  |[0m [31m[1m^[0m
+  [90m2 |[0m
+
+Parsing ecmascript source code failed
+
+
+⨯ ./src/app/page.js:1:1
+Expression expected
+[31m[1m>[0m [90m1 |[0m }
+  [90m  |[0m [31m[1m^[0m
+  [90m2 |[0m
+
+Parsing ecmascript source code failed
+
+
+ GET / 500 in 37ms (next.js: 14ms, application-code: 23ms)
+ GET / 500 in 37ms (next.js: 26ms, application-code: 11ms)
+⨯ ./src/app/page.js:1:1
+Expression expected
+[31m[1m>[0m [90m1 |[0m }
+  [90m  |[0m [31m[1m^[0m
+  [90m2 |[0m
+
+Parsing ecmascript source code failed
+
+
+[browser] Uncaught Error: ./src/app/page.js:1:1
+Expression expected
+> 1 | }
+    | ^
+  2 |
+
+Parsing ecmascript source code failed
+
+
+    at <unknown> (Error: ./src/app/page.js:1:1)
+    at <unknown> (Error: (./src/app/page.js:1:1)
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames
+⨯ Error: The default export is not a React Component in "/page"
+    at ignore-listed frames {
+  page: '/'
+}
+ GET / 500 in 897ms (next.js: 886ms, application-code: 11ms)
+[browser] Uncaught Error: The default export is not a React Component in "/page"
+✓ Compiled in 261ms
+ GET / 200 in 201ms (next.js: 86ms, application-code: 115ms)
+ GET / 200 in 87ms (next.js: 51ms, application-code: 35ms)
+ GET / 200 in 32ms (next.js: 4ms, application-code: 28ms)
+ GET / 200 in 29ms (next.js: 4ms, application-code: 26ms)
+ GET / 200 in 45ms (next.js: 7ms, application-code: 39ms)
+ GET / 200 in 22ms (next.js: 4ms, application-code: 18ms)
+ GET / 200 in 21ms (next.js: 3ms, application-code: 18ms)
+ GET / 200 in 21ms (next.js: 3ms, application-code: 18ms)
+ GET / 200 in 22ms (next.js: 4ms, application-code: 19ms)
+ GET / 200 in 24ms (next.js: 3ms, application-code: 21ms)
+ GET / 200 in 22ms (next.js: 3ms, application-code: 19ms)
+ GET / 200 in 42ms (next.js: 4ms, application-code: 39ms)
+ GET / 200 in 21ms (next.js: 4ms, application-code: 17ms)
+✓ Compiled in 118ms
+ GET / 200 in 158ms (next.js: 79ms, application-code: 79ms)
+ GET / 200 in 203ms (next.js: 35ms, application-code: 167ms)
+ GET / 200 in 89ms (next.js: 7ms, application-code: 83ms)
+ GET / 200 in 120ms (next.js: 24ms, application-code: 96ms)
+ GET / 200 in 62ms (next.js: 9ms, application-code: 52ms)
+ GET / 200 in 57ms (next.js: 12ms, application-code: 45ms)
+ GET / 200 in 31ms (next.js: 6ms, application-code: 26ms)
+ GET / 200 in 27ms (next.js: 4ms, application-code: 23ms)
+ GET / 200 in 25ms (next.js: 3ms, application-code: 22ms)
+ GET / 200 in 26ms (next.js: 3ms, application-code: 23ms)
+ GET / 200 in 29ms (next.js: 4ms, application-code: 25ms)
+ GET / 200 in 33ms (next.js: 4ms, application-code: 29ms)
+ GET / 200 in 26ms (next.js: 4ms, application-code: 23ms)
+ GET / 200 in 24ms (next.js: 3ms, application-code: 21ms)
+✓ Compiled in 139ms
+ GET / 200 in 106ms (next.js: 4ms, application-code: 101ms)
+✓ Compiled in 106ms
+✓ Compiled in 357ms
+ GET / 200 in 124ms (next.js: 97ms, application-code: 27ms)
+ GET / 200 in 28ms (next.js: 4ms, application-code: 24ms)
+ GET / 200 in 34ms (next.js: 4ms, application-code: 30ms)
+[browser] ./src/app/page.js:275:7
+Expression expected
+  273 | }
+  274 | div>
+> 275 |       </footer>
+      |       ^
+  276 |     </div>
+  277 |   )
+  278 | }
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/page.js [Client Component Browser]
+    ./src/app/page.js [Server Component]
+
+  Client Component SSR:
+    ./src/app/page.js [Client Component SSR]
+    ./src/app/page.js [Server Component] 
+[browser] ./src/app/page.js:275:7
+Expression expected
+  273 | }
+  274 | div>
+> 275 |       </footer>
+      |       ^
+  276 |     </div>
+  277 |   )
+  278 | }
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/page.js [Client Component Browser]
+    ./src/app/page.js [Server Component]
+
+  Client Component SSR:
+    ./src/app/page.js [Client Component SSR]
+    ./src/app/page.js [Server Component] 
+ GET /charities 200 in 2.4s (next.js: 2.3s, application-code: 91ms)
+ GET /how-it-works 404 in 187ms (next.js: 76ms, application-code: 111ms)
+ GET /how-it-works 404 in 315ms (next.js: 23ms, application-code: 292ms)
+ GET / 200 in 408ms (next.js: 15ms, application-code: 393ms)
+ GET /charities 200 in 100ms (next.js: 17ms, application-code: 83ms)
+ GET /pricing 404 in 122ms (next.js: 25ms, application-code: 97ms)
+ GET /pricing 404 in 225ms (next.js: 26ms, application-code: 199ms)
+✓ Compiled in 2.1s
+⚠ Fast Refresh had to perform a full reload when ./src/app/page.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 840ms (next.js: 297ms, application-code: 543ms)
+ GET / 200 in 258ms (next.js: 177ms, application-code: 81ms)
+ GET / 200 in 66ms (next.js: 9ms, application-code: 57ms)
+ GET / 200 in 75ms (next.js: 10ms, application-code: 65ms)
+ GET / 200 in 80ms (next.js: 11ms, application-code: 69ms)
+ GET / 200 in 83ms (next.js: 8ms, application-code: 75ms)
+ GET / 200 in 68ms (next.js: 7ms, application-code: 61ms)
+ GET / 200 in 108ms (next.js: 8ms, application-code: 100ms)
+ GET / 200 in 116ms (next.js: 14ms, application-code: 102ms)
+ GET / 200 in 66ms (next.js: 8ms, application-code: 58ms)
+ GET / 200 in 68ms (next.js: 10ms, application-code: 58ms)
+ GET / 200 in 54ms (next.js: 8ms, application-code: 46ms)
+ GET / 200 in 68ms (next.js: 7ms, application-code: 61ms)
+ GET / 200 in 71ms (next.js: 7ms, application-code: 64ms)
+ GET / 200 in 51ms (next.js: 7ms, application-code: 44ms)
+ GET / 200 in 55ms (next.js: 7ms, application-code: 48ms)
+ GET / 200 in 40ms (next.js: 6ms, application-code: 34ms)
+ GET / 200 in 125ms (next.js: 12ms, application-code: 114ms)
+ GET / 200 in 104ms (next.js: 12ms, application-code: 93ms)
+ GET / 200 in 66ms (next.js: 7ms, application-code: 59ms)
+ GET / 200 in 101ms (next.js: 7ms, application-code: 95ms)
+✓ Compiled in 700ms
+ GET / 200 in 500ms (next.js: 429ms, application-code: 71ms)
+ GET / 200 in 406ms (next.js: 11ms, application-code: 394ms)
+ GET / 200 in 98ms (next.js: 8ms, application-code: 90ms)
+ GET / 200 in 118ms (next.js: 11ms, application-code: 107ms)
+ GET / 200 in 79ms (next.js: 8ms, application-code: 71ms)
+ GET / 200 in 55ms (next.js: 8ms, application-code: 47ms)
+ GET / 200 in 49ms (next.js: 8ms, application-code: 40ms)
+ GET / 200 in 39ms (next.js: 5ms, application-code: 34ms)
+ GET / 200 in 39ms (next.js: 7ms, application-code: 32ms)
+ GET / 200 in 49ms (next.js: 5ms, application-code: 44ms)
+ GET / 200 in 80ms (next.js: 8ms, application-code: 72ms)
+ GET / 200 in 72ms (next.js: 9ms, application-code: 64ms)
+ GET / 200 in 195ms (next.js: 121ms, application-code: 74ms)
+ GET / 200 in 110ms (next.js: 8ms, application-code: 102ms)
+ GET / 200 in 98ms (next.js: 7ms, application-code: 91ms)
+ GET / 200 in 68ms (next.js: 11ms, application-code: 57ms)
+ GET / 200 in 47ms (next.js: 9ms, application-code: 38ms)
+ GET / 200 in 42ms (next.js: 5ms, application-code: 37ms)
+ GET / 200 in 38ms (next.js: 4ms, application-code: 34ms)
+ GET / 200 in 43ms (next.js: 4ms, application-code: 39ms)
+ GET / 200 in 55ms (next.js: 6ms, application-code: 49ms)
+ GET / 200 in 102ms (next.js: 11ms, application-code: 90ms)
+ GET / 200 in 66ms (next.js: 8ms, application-code: 58ms)
+ GET / 200 in 174ms (next.js: 22ms, application-code: 152ms)
+ GET / 200 in 512ms (next.js: 382ms, application-code: 130ms)
+ GET / 200 in 90ms (next.js: 10ms, application-code: 81ms)
+ GET / 200 in 56ms (next.js: 6ms, application-code: 50ms)
+ GET / 200 in 70ms (next.js: 9ms, application-code: 61ms)
+ GET / 200 in 71ms (next.js: 10ms, application-code: 62ms)
+ GET / 200 in 86ms (next.js: 8ms, application-code: 78ms)
+ GET / 200 in 59ms (next.js: 8ms, application-code: 51ms)
+ GET / 200 in 59ms (next.js: 7ms, application-code: 52ms)
+ GET / 200 in 58ms (next.js: 6ms, application-code: 52ms)
+ GET / 200 in 49ms (next.js: 6ms, application-code: 43ms)
+ GET / 200 in 43ms (next.js: 5ms, application-code: 38ms)
+ GET / 200 in 50ms (next.js: 6ms, application-code: 44ms)
+✓ Compiled in 385ms
+ GET / 200 in 258ms (next.js: 188ms, application-code: 70ms)
+ GET / 200 in 97ms (next.js: 7ms, application-code: 90ms)
+ GET / 200 in 97ms (next.js: 13ms, application-code: 84ms)
+ GET / 200 in 137ms (next.js: 14ms, application-code: 123ms)
+ GET / 200 in 59ms (next.js: 7ms, application-code: 51ms)
+ GET / 200 in 62ms (next.js: 6ms, application-code: 55ms)
+ GET / 200 in 121ms (next.js: 8ms, application-code: 113ms)
+ GET / 200 in 90ms (next.js: 24ms, application-code: 66ms)
+ GET / 200 in 51ms (next.js: 8ms, application-code: 43ms)
+ GET / 200 in 43ms (next.js: 6ms, application-code: 37ms)
+ GET / 200 in 61ms (next.js: 5ms, application-code: 56ms)
+ GET / 200 in 85ms (next.js: 12ms, application-code: 73ms)
+ GET / 200 in 79ms (next.js: 11ms, application-code: 68ms)
+ GET / 200 in 66ms (next.js: 8ms, application-code: 57ms)
+✓ Compiled in 281ms
+✓ Compiled in 304ms
+ GET / 200 in 2.7s (next.js: 1734ms, application-code: 948ms)
