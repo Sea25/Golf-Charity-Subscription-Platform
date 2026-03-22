@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 @import "tailwindcss";
 
 @theme {
@@ -38,3 +39,6 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #10b981; 
 }
+=======
+@import "tailwindcss";
+>>>>>>> 439dc91c3d863ceacfe4d48f68c76629aefb2f4c
