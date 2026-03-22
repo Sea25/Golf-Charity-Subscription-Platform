@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { stripe } from '@/utils/stripe/server'
 import { supabaseAdmin } from '@/utils/supabase/admin'
 
-// Ensure a profile row exists - create it if the trigger missed it
+// Ensure a profile row exists - auto-create from auth if trigger missed it
 async function ensureProfile(userId) {
   const { data: profile } = await supabaseAdmin
     .from('profiles')
@@ -14,7 +14,8 @@ async function ensureProfile(userId) {
 
   console.log(`⚠️ Profile missing for ${userId} — auto-creating from auth...`)
 
-  const { data: authData, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId)
+  const { data: authData, error: authError } =
+    await supabaseAdmin.auth.admin.getUserById(userId)
 
   if (authError || !authData?.user) {
     console.error(`❌ Could not fetch auth user ${userId}:`, authError?.message)
@@ -44,8 +45,6 @@ async function ensureProfile(userId) {
 // Safely convert Stripe timestamp to ISO string
 function stripeTimestampToISO(ts) {
   if (!ts) return null
-  // If it looks like seconds (< year 3000 in ms), multiply by 1000
-  // Unix seconds for year 3000 = ~32503680000, so anything < 1e12 is seconds
   const ms = ts < 1e12 ? ts * 1000 : ts
   const d = new Date(ms)
   if (isNaN(d.getTime())) return null
@@ -59,7 +58,6 @@ async function upsertSubscription(sub, userId) {
     return
   }
 
-  // Ensure profile exists (auto-create if trigger missed it)
   const profileReady = await ensureProfile(userId)
   if (!profileReady) {
     console.error(`❌ Cannot upsert subscription - profile unavailable for ${userId}`)
@@ -92,7 +90,7 @@ async function upsertSubscription(sub, userId) {
   if (error) {
     console.error('❌ Subscription upsert failed:', error.message)
   } else {
-    console.log(`✅ Subscription ${sub.id} upserted for user ${userId} (${sub.status})`)
+    console.log(`✅ Subscription ${sub.id} upserted — status: ${sub.status}, user: ${userId}`)
   }
 }
 
@@ -115,17 +113,17 @@ export async function POST(req) {
 
   console.log(`🔔 Webhook accepted! Event type: ${event.type}`)
 
-  // ✅ Checkout completed - link Stripe customer to Supabase user
+  // ✅ Checkout completed
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object
     const userId = session.client_reference_id
     const customerId = session.customer
 
     if (userId && customerId) {
-      // Ensure profile exists FIRST before anything else
+      // Ensure profile exists FIRST
       await ensureProfile(userId)
 
-      // Update profile with Stripe customer ID
+      // Link Stripe customer ID to profile
       const { error } = await supabaseAdmin
         .from('profiles')
         .update({ stripe_customer_id: customerId })
@@ -137,13 +135,13 @@ export async function POST(req) {
         console.log(`✅ Linked Stripe customer ${customerId} to user ${userId}`)
       }
 
-      // Handle subscription from checkout
+      // Upsert the subscription
       if (session.subscription) {
         try {
           const sub = await stripe.subscriptions.retrieve(session.subscription)
           await upsertSubscription(sub, userId)
         } catch (err) {
-          console.error('⚠️ Error retrieving subscription from checkout:', err.message)
+          console.error('⚠️ Error retrieving subscription:', err.message)
         }
       }
     } else {
@@ -159,7 +157,7 @@ export async function POST(req) {
   ) {
     const sub = event.data.object
 
-    // Try to get userId from metadata first
+    // Try metadata first
     let userId = sub.metadata?.userId
 
     // Fall back to looking up by Stripe customer ID
@@ -173,11 +171,13 @@ export async function POST(req) {
       if (profile) {
         userId = profile.id
       } else {
-        console.warn(`⚠️ No profile found for Stripe customer ${sub.customer}. Subscription not saved.`)
+        console.warn(`⚠️ No profile found for Stripe customer ${sub.customer}`)
       }
     }
 
-    await upsertSubscription(sub, userId)
+    if (userId) {
+      await upsertSubscription(sub, userId)
+    }
   }
 
   return NextResponse.json({ received: true })

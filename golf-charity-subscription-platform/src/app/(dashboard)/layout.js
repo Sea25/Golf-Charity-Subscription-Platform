@@ -8,15 +8,12 @@ export default async function DashboardLayout({ children }) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const isAdmin = user.email === process.env.ADMIN_EMAIL
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Dashboard Navigation */}
       <nav className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            
+
             <div className="flex items-center">
               <Link href="/dashboard" className="text-xl font-bold text-rose-500">
                 IMPACT GOLF
@@ -35,11 +32,6 @@ export default async function DashboardLayout({ children }) {
                 <Link href="/subscribe" className="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 font-medium">
                   Subscribe
                 </Link>
-                {isAdmin && (
-                  <Link href="/admin" className="text-emerald-600 hover:text-emerald-800 inline-flex items-center px-1 pt-1 font-medium">
-                    Admin
-                  </Link>
-                )}
               </div>
             </div>
 

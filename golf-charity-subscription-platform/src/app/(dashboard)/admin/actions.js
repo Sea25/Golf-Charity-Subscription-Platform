@@ -1,66 +1,61 @@
-import Link from 'next/link'
+'use server'
+
+import { supabaseAdmin } from '@/utils/supabase/admin'
 import { createClient } from '@/utils/supabase/server'
+import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-export default async function DashboardLayout({ children }) {
+export async function runMonthlyDraw() {
+  console.log('\n--- 🚀 ADMIN DRAW ACTION TRIGGERED ---')
   const supabase = await createClient()
-
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  
+  if (!user) {
+    redirect('/admin?status=error&message=Not+authenticated')
+  }
 
-  const isAdmin =
-    user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL ||
-    user.email === 'admin@impactgolf.com'
+  // 1. Retrieve active subscriptions
+  const { data: activeSubs, error } = await supabaseAdmin
+    .from('subscriptions')
+    .select('user_id')
+    .eq('status', 'active')
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Dashboard Navigation */}
-      <nav className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            
-            <div className="flex items-center">
-              <Link href="/dashboard" className="text-xl font-bold text-rose-500">
-                IMPACT GOLF
-              </Link>
+  if (error || !activeSubs || activeSubs.length === 0) {
+    redirect('/admin?status=error&message=No+active+subscribers+found+for+the+draw')
+  }
+  console.log(`✅ Found ${activeSubs.length} active subscribers.`)
 
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <Link href="/dashboard" className="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 font-medium">
-                  Overview
-                </Link>
-                <Link href="/scores" className="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 font-medium">
-                  My Scores
-                </Link>
-                <Link href="/charity" className="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 font-medium">
-                  My Charity
-                </Link>
-                <Link href="/subscribe" className="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 font-medium">
-                  Subscribe
-                </Link>
-                {isAdmin && (
-                  <Link href="/admin" className="text-emerald-600 hover:text-emerald-800 inline-flex items-center px-1 pt-1 font-medium">
-                    Admin
-                  </Link>
-                )}
-              </div>
-            </div>
+  // 2. Check current month
+  const drawMonth = new Date().toLocaleString('default', { month: 'long', year: 'numeric' })
 
-            <div className="flex items-center gap-4">
-              <span className="text-xs text-gray-400 hidden sm:block">{user.email}</span>
-              <form action="/auth/signout" method="POST">
-                <button type="submit" className="text-sm text-gray-500 hover:text-gray-700">
-                  Sign Out
-                </button>
-              </form>
-            </div>
+  const { data: existingDraw } = await supabaseAdmin
+    .from('draws')
+    .select('id')
+    .eq('draw_month', drawMonth)
+    .maybeSingle()
 
-          </div>
-        </div>
-      </nav>
+  if (existingDraw) {
+    redirect(`/admin?status=error&message=A+draw+has+already+been+run+for+${encodeURIComponent(drawMonth)}`)
+  }
 
-      <main className="flex-1 max-w-7xl w-full mx-auto py-6 sm:px-6 lg:px-8">
-        {children}
-      </main>
-    </div>
-  )
+  // 3. Pick random winner
+  const randomIndex = Math.floor(Math.random() * activeSubs.length)
+  const winnerId = activeSubs[randomIndex].user_id
+  console.log(`🎉 Winner selected! Profile ID: ${winnerId}`)
+
+  // 4. Insert into draws table
+  const { error: insertError } = await supabaseAdmin
+    .from('draws')
+    .insert({
+      draw_month: drawMonth,
+      winner_id: winnerId,
+    })
+
+  if (insertError) {
+    redirect(`/admin?status=error&message=Database+insert+failed:+${encodeURIComponent(insertError.message)}`)
+  }
+
+  revalidatePath('/admin')
+  revalidatePath('/dashboard')
+  redirect(`/admin?status=success&message=Monthly+draw+completed!+Winner+selected+for+${encodeURIComponent(drawMonth)}`)
 }

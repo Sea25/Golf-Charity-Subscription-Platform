@@ -8,9 +8,7 @@ export async function updateCharityChoice(formData) {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    redirect('/login')
-  }
+  if (!user) redirect('/login')
 
   const charityId = formData.get('charity_id')
   const charityPercentage = parseFloat(formData.get('charity_percentage'))
@@ -33,7 +31,7 @@ export async function updateCharityChoice(formData) {
 
   if (error) {
     console.error('Error updating charity:', error)
-    redirect('/charity?message=Could+not+update+your+charity+preferences')
+    redirect('/charity?message=Could+not+save+your+preferences')
   }
 
   revalidatePath('/charity')
