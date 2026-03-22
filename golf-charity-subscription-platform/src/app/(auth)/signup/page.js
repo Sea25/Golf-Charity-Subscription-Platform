@@ -1,6 +1,6 @@
-import { login } from '../actions'
+import { signup } from '../actions'
 
-export default async function LoginPage({ searchParams }) {
+export default async function SignupPage({ searchParams }) {
   const params = await searchParams
   const message = params?.message
 
@@ -11,10 +11,10 @@ export default async function LoginPage({ searchParams }) {
         fontSize: '1.75rem', fontWeight: 400,
         color: '#0f1a14', marginBottom: '6px', letterSpacing: '-0.01em'
       }}>
-        Welcome back
+        Create account
       </h2>
       <p style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '28px' }}>
-        Sign in to your account
+        Join and start giving back through golf
       </p>
 
       {message && (
@@ -27,7 +27,24 @@ export default async function LoginPage({ searchParams }) {
         </div>
       )}
 
-      <form action={login} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <form action={signup} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div>
+          <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>
+            Full name
+          </label>
+          <input
+            name="full_name"
+            type="text"
+            required
+            placeholder="Your name"
+            style={{
+              width: '100%', padding: '10px 14px',
+              border: '1px solid #e5e7eb', borderRadius: '8px',
+              fontSize: '14px', color: '#0f1a14', outline: 'none'
+            }}
+          />
+        </div>
+
         <div>
           <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>
             Email address
@@ -40,9 +57,7 @@ export default async function LoginPage({ searchParams }) {
             style={{
               width: '100%', padding: '10px 14px',
               border: '1px solid #e5e7eb', borderRadius: '8px',
-              fontSize: '14px', color: '#0f1a14',
-              outline: 'none', background: '#fff',
-              transition: 'border-color 0.15s'
+              fontSize: '14px', color: '#0f1a14', outline: 'none'
             }}
           />
         </div>
@@ -55,12 +70,11 @@ export default async function LoginPage({ searchParams }) {
             name="password"
             type="password"
             required
-            placeholder="••••••••"
+            placeholder="Min. 8 characters"
             style={{
               width: '100%', padding: '10px 14px',
               border: '1px solid #e5e7eb', borderRadius: '8px',
-              fontSize: '14px', color: '#0f1a14',
-              outline: 'none', background: '#fff'
+              fontSize: '14px', color: '#0f1a14', outline: 'none'
             }}
           />
         </div>
@@ -75,14 +89,14 @@ export default async function LoginPage({ searchParams }) {
             cursor: 'pointer', marginTop: '4px'
           }}
         >
-          Sign in
+          Create account
         </button>
       </form>
 
       <p style={{ textAlign: 'center', marginTop: '24px', fontSize: '13px', color: '#9ca3af' }}>
-        No account?{' '}
-        <a href="/signup" style={{ color: '#15803d', fontWeight: 500, textDecoration: 'none' }}>
-          Create one
+        Already have an account?{' '}
+        <a href="/login" style={{ color: '#15803d', fontWeight: 500, textDecoration: 'none' }}>
+          Sign in
         </a>
       </p>
     </>

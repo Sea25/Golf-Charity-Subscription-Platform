@@ -1,133 +1,222 @@
-import { createCheckoutSession } from './actions'
+import { createClient } from '@/utils/supabase/server'
+import { supabaseAdmin } from '@/utils/supabase/admin'
+import { redirect } from 'next/navigation'
+import { runMonthlyDraw } from './actions'
 
-export default async function SubscribePage(props) {
+export const dynamic = 'force-dynamic'
+
+export default async function AdminDrawPage(props) {
   const searchParams = props.searchParams ? await props.searchParams : {}
-  const isCanceled = searchParams?.canceled
-  const isSuccess = searchParams?.success
+  const status = searchParams.status
+  const message = searchParams.message
 
-  return (
-    <div>
-      <div style={{ marginBottom: '40px' }}>
-        <h1 style={{
-          fontFamily: "'DM Serif Display', serif",
-          fontSize: '2rem', fontWeight: 400,
-          color: '#0f1a14', letterSpacing: '-0.02em', marginBottom: '6px'
-        }}>
-          Choose a plan
-        </h1>
-        <p style={{ color: '#9ca3af', fontSize: '14px' }}>
-          Subscribe to unlock scores, draws, and charity giving.
-        </p>
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
 
-        {isCanceled && (
-          <div style={{
-            marginTop: '16px', background: '#fffbeb', border: '1px solid #fde68a',
-            borderRadius: '10px', padding: '12px 16px',
-            fontSize: '13px', color: '#92400e', maxWidth: '420px'
-          }}>
-            Checkout was canceled — no charge was made.
-          </div>
-        )}
-        {isSuccess && (
-          <div style={{
-            marginTop: '16px', background: '#f0fdf4', border: '1px solid #bbf7d0',
-            borderRadius: '10px', padding: '12px 16px',
-            fontSize: '13px', color: '#15803d', maxWidth: '420px'
-          }}>
-            🎉 You&apos;re subscribed! Welcome to Impact Golf.
-          </div>
-        )}
-      </div>
+  const isAdmin =
+    user.email === process.env.ADMIN_EMAIL ||
+    user.email === 'admin@impactgolf.com'
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', maxWidth: '680px' }}>
-
-        {/* Monthly */}
+  if (!isAdmin) {
+    return (
+      <div style={{
+        minHeight: '100vh', background: '#f9fafb',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontFamily: "'DM Sans', sans-serif"
+      }}>
         <div style={{
           background: '#fff', border: '1px solid #e5e7eb',
-          borderRadius: '16px', padding: '32px', display: 'flex', flexDirection: 'column'
+          borderRadius: '16px', padding: '40px', textAlign: 'center', maxWidth: '400px'
         }}>
-          <div style={{ marginBottom: '24px' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#9ca3af', marginBottom: '12px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Monthly</div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-              <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: '3rem', color: '#0f1a14', letterSpacing: '-0.03em' }}>$15</span>
-              <span style={{ fontSize: '14px', color: '#9ca3af' }}>/month</span>
-            </div>
-          </div>
-
-          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {['10%+ to your chosen charity', 'Monthly prize draw entry', 'Score tracking (5 rounds)', 'Cancel anytime'].map(f => (
-              <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#6b7280' }}>
-                <span style={{ color: '#22c55e', fontSize: '14px', fontWeight: 700, flexShrink: 0 }}>✓</span>
-                {f}
-              </li>
-            ))}
-          </ul>
-
-          <form action={createCheckoutSession} style={{ marginTop: 'auto' }}>
-            <input type="hidden" name="plan_type" value="monthly" />
-            <button type="submit" style={{
-              width: '100%', padding: '12px',
-              background: '#f3f4f6', color: '#0f1a14',
-              border: '1px solid #e5e7eb', borderRadius: '9px',
-              fontSize: '14px', fontWeight: 600, cursor: 'pointer',
-              fontFamily: "'DM Sans', sans-serif"
-            }}>
-              Subscribe monthly
-            </button>
-          </form>
-        </div>
-
-        {/* Yearly */}
-        <div style={{
-          background: '#0f1a14', border: '1px solid #0f1a14',
-          borderRadius: '16px', padding: '32px', display: 'flex', flexDirection: 'column',
-          position: 'relative'
-        }}>
-          <div style={{
-            position: 'absolute', top: '-12px', left: '24px',
-            background: '#22c55e', color: '#0f1a14',
-            padding: '4px 12px', borderRadius: '99px',
-            fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em'
-          }}>
-            BEST VALUE
-          </div>
-
-          <div style={{ marginBottom: '24px' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '12px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Yearly</div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', flexWrap: 'wrap' }}>
-              <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: '3rem', color: '#fff', letterSpacing: '-0.03em' }}>$150</span>
-              <span style={{ fontSize: '14px', color: '#6b7280' }}>/year</span>
-            </div>
-            <div style={{ fontSize: '12px', color: '#4ade80', marginTop: '4px' }}>2 months free — save $30</div>
-          </div>
-
-          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {['10%+ to your chosen charity', 'Monthly prize draw entry', 'Score tracking (5 rounds)', '2 months free vs monthly'].map(f => (
-              <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#9ca3af' }}>
-                <span style={{ color: '#4ade80', fontSize: '14px', fontWeight: 700, flexShrink: 0 }}>✓</span>
-                {f}
-              </li>
-            ))}
-          </ul>
-
-          <form action={createCheckoutSession} style={{ marginTop: 'auto' }}>
-            <input type="hidden" name="plan_type" value="yearly" />
-            <button type="submit" style={{
-              width: '100%', padding: '12px',
-              background: '#22c55e', color: '#0f1a14',
-              border: 'none', borderRadius: '9px',
-              fontSize: '14px', fontWeight: 700, cursor: 'pointer',
-              fontFamily: "'DM Sans', sans-serif"
-            }}>
-              Subscribe yearly
-            </button>
-          </form>
+          <div style={{ fontSize: '2rem', marginBottom: '16px' }}>🔒</div>
+          <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: '1.5rem', color: '#0f1a14', marginBottom: '8px', fontWeight: 400 }}>
+            Access denied
+          </h1>
+          <p style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '16px' }}>
+            You don&apos;t have admin access.
+          </p>
+          <code style={{ fontSize: '12px', background: '#f3f4f6', padding: '4px 8px', borderRadius: '5px', color: '#6b7280' }}>
+            {user.email}
+          </code>
         </div>
       </div>
+    )
+  }
 
-      <p style={{ marginTop: '20px', fontSize: '12px', color: '#9ca3af', maxWidth: '560px' }}>
-        Secure payment via Stripe. Cancel anytime. A minimum of 10% of your subscription goes directly to your chosen charity.
-      </p>
+  let draws = []
+  let tableMissingError = false
+
+  const { data: fetchedDraws, error } = await supabaseAdmin
+    .from('draws')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    if (error.code === '42P01') tableMissingError = true
+  } else {
+    draws = fetchedDraws || []
+  }
+
+  const { count: activeSubsCount } = await supabaseAdmin
+    .from('subscriptions')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'active')
+
+  return (
+    <div style={{ fontFamily: "'DM Sans', sans-serif", minHeight: '100vh', background: '#f9fafb' }}>
+      {/* Nav */}
+      <nav style={{
+        background: '#fff', borderBottom: '1px solid #f0f0f0',
+        padding: '0 2rem', height: '60px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+      }}>
+        <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: '1.1rem', color: '#0f1a14' }}>
+          Impact Golf <span style={{ color: '#9ca3af', fontFamily: "'DM Sans', sans-serif", fontSize: '13px', fontWeight: 400 }}>· Admin</span>
+        </span>
+        <a href="/dashboard" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none' }}>
+          ← Back to dashboard
+        </a>
+      </nav>
+
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '36px 2rem' }}>
+
+        {/* Header */}
+        <div style={{ marginBottom: '32px' }}>
+          <h1 style={{
+            fontFamily: "'DM Serif Display', serif",
+            fontSize: '2rem', fontWeight: 400, color: '#0f1a14',
+            letterSpacing: '-0.02em', marginBottom: '6px'
+          }}>
+            Admin panel
+          </h1>
+          <p style={{ fontSize: '14px', color: '#9ca3af' }}>
+            Logged in as <code style={{ background: '#f3f4f6', padding: '2px 6px', borderRadius: '4px', fontSize: '12px' }}>{user.email}</code>
+          </p>
+        </div>
+
+        {/* Status banner */}
+        {message && (
+          <div style={{
+            padding: '14px 16px', borderRadius: '10px', marginBottom: '24px',
+            background: status === 'success' ? '#f0fdf4' : '#fef2f2',
+            border: `1px solid ${status === 'success' ? '#bbf7d0' : '#fecaca'}`,
+            color: status === 'success' ? '#15803d' : '#dc2626',
+            fontSize: '13px'
+          }}>
+            {status === 'success' ? '✅' : '⚠️'} {message}
+          </div>
+        )}
+
+        {tableMissingError && (
+          <div style={{
+            padding: '14px 16px', borderRadius: '10px', marginBottom: '24px',
+            background: '#fffbeb', border: '1px solid #fde68a',
+            color: '#92400e', fontSize: '13px'
+          }}>
+            ⚠️ The <code>draws</code> table is missing. Run <code>supabase_schema.sql</code> in your Supabase SQL Editor.
+          </div>
+        )}
+
+        {/* Stats */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '28px' }}>
+          {[
+            { label: 'Active subscribers', value: activeSubsCount ?? 0 },
+            { label: 'Draws run', value: draws.length },
+          ].map((s, i) => (
+            <div key={i} style={{
+              background: '#fff', border: '1px solid #e5e7eb',
+              borderRadius: '12px', padding: '20px 24px'
+            }}>
+              <div style={{ fontSize: '12px', color: '#9ca3af', fontWeight: 500, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</div>
+              <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '2.25rem', color: '#0f1a14', letterSpacing: '-0.02em' }}>{s.value}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Draw control */}
+        <div style={{
+          background: '#fff', border: '1px solid #e5e7eb',
+          borderRadius: '14px', padding: '28px', marginBottom: '28px'
+        }}>
+          <h2 style={{ fontSize: '15px', fontWeight: 600, color: '#0f1a14', marginBottom: '8px' }}>
+            Monthly draw
+          </h2>
+          <p style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '24px', lineHeight: 1.6 }}>
+            Randomly selects a winner from all active subscribers. One draw per month — already-run months are blocked automatically.
+          </p>
+          <form action={runMonthlyDraw}>
+            <button
+              type="submit"
+              disabled={tableMissingError}
+              style={{
+                padding: '11px 28px',
+                background: tableMissingError ? '#e5e7eb' : '#0f1a14',
+                color: tableMissingError ? '#9ca3af' : '#fff',
+                border: 'none', borderRadius: '9px',
+                fontSize: '14px', fontWeight: 600,
+                cursor: tableMissingError ? 'not-allowed' : 'pointer',
+                fontFamily: "'DM Sans', sans-serif"
+              }}
+            >
+              Run monthly draw
+            </button>
+          </form>
+        </div>
+
+        {/* Past draws */}
+        <div style={{
+          background: '#fff', border: '1px solid #e5e7eb',
+          borderRadius: '14px', padding: '28px'
+        }}>
+          <h2 style={{ fontSize: '15px', fontWeight: 600, color: '#0f1a14', marginBottom: '20px' }}>
+            Past winners
+          </h2>
+
+          {draws.length > 0 ? (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                    {['Month', 'Winner ID', 'Date'].map(h => (
+                      <th key={h} style={{
+                        textAlign: 'left', padding: '0 0 12px',
+                        fontSize: '11px', fontWeight: 600, color: '#9ca3af',
+                        letterSpacing: '0.06em', textTransform: 'uppercase'
+                      }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {draws.map((d, i) => (
+                    <tr key={d.id} style={{ borderBottom: i < draws.length - 1 ? '1px solid #f9fafb' : 'none' }}>
+                      <td style={{ padding: '14px 0', fontSize: '14px', fontWeight: 600, color: '#0f1a14' }}>
+                        {d.draw_month}
+                      </td>
+                      <td style={{ padding: '14px 0' }}>
+                        <code style={{ fontSize: '12px', background: '#f3f4f6', padding: '3px 8px', borderRadius: '5px', color: '#6b7280' }}>
+                          {d.winner_id || 'N/A'}
+                        </code>
+                      </td>
+                      <td style={{ padding: '14px 0', fontSize: '13px', color: '#9ca3af' }}>
+                        {new Date(d.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div style={{
+              textAlign: 'center', padding: '40px',
+              background: '#fafafa', borderRadius: '10px',
+              border: '2px dashed #e5e7eb'
+            }}>
+              <p style={{ fontSize: '14px', color: '#9ca3af' }}>No draws run yet</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
