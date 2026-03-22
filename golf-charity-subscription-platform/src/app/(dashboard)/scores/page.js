@@ -8,11 +8,9 @@ export default async function ScoresPage(props) {
   const message = searchParams.message
 
   const supabase = await createClient()
-
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  // Check active subscription
   const { data: sub } = await supabase
     .from('subscriptions')
     .select('status')
@@ -21,7 +19,6 @@ export default async function ScoresPage(props) {
     .limit(1)
     .maybeSingle()
 
-  // Fetch latest 5 scores - sorted newest first
   const { data: scores } = await supabase
     .from('scores')
     .select('*')
@@ -30,44 +27,72 @@ export default async function ScoresPage(props) {
     .order('created_at', { ascending: false })
     .limit(5)
 
-  // Today's date for the default date input value
   const today = new Date().toISOString().split('T')[0]
+  const avg = scores?.length
+    ? Math.round(scores.reduce((a, s) => a + s.score, 0) / scores.length)
+    : null
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-900 mb-1">My Scores</h1>
-      <p className="text-gray-500 mb-6">
-        Submit your Stableford scores. Only your <span className="font-semibold text-rose-500">latest 5 rounds</span> are kept — adding a 6th automatically removes the oldest.
-      </p>
+    <div>
+      {/* Header */}
+      <div style={{ marginBottom: '32px' }}>
+        <h1 style={{
+          fontFamily: "'DM Serif Display', serif",
+          fontSize: '2rem', fontWeight: 400,
+          color: '#0f1a14', letterSpacing: '-0.02em', marginBottom: '6px'
+        }}>
+          My Scores
+        </h1>
+        <p style={{ color: '#9ca3af', fontSize: '14px' }}>
+          Only your latest 5 Stableford rounds are stored. Adding a 6th removes the oldest automatically.
+        </p>
+      </div>
 
+      {/* Banners */}
       {!sub && (
-        <div className="mb-6 p-4 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 text-sm">
-          ⚠️ You need an active subscription to enter scores.{' '}
-          <a href="/subscribe" className="font-semibold underline">Subscribe now →</a>
+        <div style={{
+          background: '#fffbeb', border: '1px solid #fde68a',
+          borderRadius: '10px', padding: '14px 16px',
+          fontSize: '13px', color: '#92400e', marginBottom: '20px',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+        }}>
+          <span>⚠️ Active subscription required to enter scores</span>
+          <a href="/subscribe" style={{ fontWeight: 600, color: '#92400e', textDecoration: 'underline' }}>Subscribe →</a>
         </div>
       )}
-
       {success && (
-        <div className="mb-6 p-4 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-medium">
-          ✅ Score submitted! Your latest 5 rounds are shown below.
+        <div style={{
+          background: '#f0fdf4', border: '1px solid #bbf7d0',
+          borderRadius: '10px', padding: '14px 16px',
+          fontSize: '13px', color: '#15803d', marginBottom: '20px'
+        }}>
+          ✅ Score added successfully. Latest 5 rounds are shown below.
         </div>
       )}
-
       {message && (
-        <div className="mb-6 p-4 rounded-xl bg-red-50 text-red-600 border border-red-200 text-sm">
+        <div style={{
+          background: '#fef2f2', border: '1px solid #fecaca',
+          borderRadius: '10px', padding: '14px 16px',
+          fontSize: '13px', color: '#dc2626', marginBottom: '20px'
+        }}>
           ⚠️ {message}
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
 
-        {/* Add Score Form */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-700 mb-4">Add New Score</h2>
-          <form action={addScore} className="space-y-4 bg-gray-50 border border-gray-100 p-6 rounded-xl">
+        {/* Form */}
+        <div style={{
+          background: '#fff', border: '1px solid #e5e7eb',
+          borderRadius: '14px', padding: '28px'
+        }}>
+          <h2 style={{ fontSize: '15px', fontWeight: 600, color: '#0f1a14', marginBottom: '24px' }}>
+            Add new round
+          </h2>
+          <form action={addScore} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Stableford Score <span className="text-gray-400">(1–45)</span>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#9ca3af', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '8px' }}>
+                Stableford Score (1–45)
               </label>
               <input
                 type="number"
@@ -75,98 +100,118 @@ export default async function ScoresPage(props) {
                 min="1"
                 max="45"
                 required
-                placeholder="e.g. 32"
-                className="block w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-rose-400 text-lg font-bold"
+                placeholder="32"
+                style={{
+                  width: '100%', padding: '12px 14px',
+                  border: '1px solid #e5e7eb', borderRadius: '9px',
+                  fontSize: '22px', fontFamily: "'DM Serif Display', serif",
+                  color: '#0f1a14', outline: 'none',
+                  background: '#fafafa'
+                }}
               />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date Played
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#9ca3af', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '8px' }}>
+                Date played
               </label>
               <input
                 type="date"
                 name="played_date"
                 required
                 defaultValue={today}
-                className="block w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-rose-400"
+                style={{
+                  width: '100%', padding: '12px 14px',
+                  border: '1px solid #e5e7eb', borderRadius: '9px',
+                  fontSize: '14px', color: '#0f1a14', outline: 'none',
+                  background: '#fafafa'
+                }}
               />
             </div>
-
             <button
               type="submit"
-              className="w-full py-3 text-white bg-rose-600 hover:bg-rose-700 rounded-lg font-bold transition-colors"
+              style={{
+                width: '100%', padding: '12px',
+                background: '#0f1a14', color: '#fff',
+                border: 'none', borderRadius: '9px',
+                fontSize: '14px', fontWeight: 600,
+                cursor: 'pointer', marginTop: '4px'
+              }}
             >
-              Submit Score
+              Submit score
             </button>
           </form>
         </div>
 
-        {/* Latest 5 Scores */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-700">Latest 5 Rounds</h2>
-            {scores && scores.length > 0 && (
-              <span className="text-xs bg-rose-100 text-rose-600 px-2 py-1 rounded-full font-medium">
-                {scores.length}/5 stored
+        {/* Scores list */}
+        <div style={{
+          background: '#fff', border: '1px solid #e5e7eb',
+          borderRadius: '14px', padding: '28px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <h2 style={{ fontSize: '15px', fontWeight: 600, color: '#0f1a14' }}>Latest 5 rounds</h2>
+            {scores?.length > 0 && (
+              <span style={{
+                background: '#f3f4f6', color: '#6b7280',
+                padding: '3px 10px', borderRadius: '99px', fontSize: '12px', fontWeight: 500
+              }}>
+                {scores.length}/5
               </span>
             )}
           </div>
 
           {scores && scores.length > 0 ? (
-            <div className="space-y-3">
-              {scores.map((s, i) => (
-                <div
-                  key={s.id}
-                  className={`flex justify-between items-center p-4 rounded-xl border-l-4 ${
-                    i === 0
-                      ? 'bg-rose-50 border-rose-500'
-                      : 'bg-gray-50 border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                      i === 0
-                        ? 'bg-rose-200 text-rose-700'
-                        : 'bg-gray-200 text-gray-600'
-                    }`}>
-                      #{i + 1}
+            <>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '20px' }}>
+                {scores.map((s, i) => (
+                  <div key={s.id} style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    padding: '12px 14px', borderRadius: '9px',
+                    background: i === 0 ? '#f0fdf4' : '#fafafa',
+                    border: `1px solid ${i === 0 ? '#bbf7d0' : '#f0f0f0'}`
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span style={{
+                        fontSize: '11px', fontWeight: 700,
+                        color: i === 0 ? '#15803d' : '#9ca3af',
+                        width: '24px'
+                      }}>#{i + 1}</span>
+                      <span style={{ fontSize: '13px', color: '#6b7280' }}>
+                        {new Date(s.played_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </span>
                     </div>
-                    <div>
-                      <p className="font-medium text-gray-800">
-                        {new Date(s.played_date + 'T00:00:00').toLocaleDateString('en-GB', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric'
-                        })}
-                      </p>
-                      <p className="text-xs text-gray-400">Stableford</p>
-                    </div>
+                    <span style={{
+                      fontFamily: "'DM Serif Display', serif",
+                      fontSize: '1.5rem', color: i === 0 ? '#15803d' : '#0f1a14'
+                    }}>{s.score}</span>
                   </div>
-
-                  <div className={`text-2xl font-black ${i === 0 ? 'text-rose-600' : 'text-gray-600'}`}>
-                    {s.score}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
 
               {/* Average */}
-              <div className="mt-4 p-4 bg-gray-900 rounded-xl flex justify-between items-center">
-                <span className="text-gray-400 text-sm font-medium">Average Score</span>
-                <span className="text-white text-2xl font-black">
-                  {Math.round(scores.reduce((acc, s) => acc + s.score, 0) / scores.length)}
-                </span>
+              <div style={{
+                background: '#0f1a14', borderRadius: '10px',
+                padding: '16px 18px',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+              }}>
+                <span style={{ fontSize: '13px', color: '#9ca3af' }}>Average score</span>
+                <span style={{
+                  fontFamily: "'DM Serif Display', serif",
+                  fontSize: '1.75rem', color: '#4ade80'
+                }}>{avg}</span>
               </div>
-            </div>
+            </>
           ) : (
-            <div className="text-center p-12 bg-gray-50 rounded-xl border-2 border-dashed text-gray-400">
-              <p className="text-4xl mb-3">⛳</p>
-              <p className="font-medium">No scores yet</p>
-              <p className="text-sm mt-1">Submit your first round to get started</p>
+            <div style={{
+              textAlign: 'center', padding: '48px 24px',
+              background: '#fafafa', borderRadius: '10px',
+              border: '2px dashed #e5e7eb'
+            }}>
+              <div style={{ fontSize: '2rem', marginBottom: '10px' }}>⛳</div>
+              <p style={{ fontSize: '14px', color: '#9ca3af' }}>No scores yet</p>
+              <p style={{ fontSize: '12px', color: '#d1d5db', marginTop: '4px' }}>Submit your first round</p>
             </div>
           )}
         </div>
-
       </div>
     </div>
   )

@@ -1,72 +1,90 @@
-import { signup } from '../actions'
+import { login } from '../actions'
 
-export default async function SignupPage({ searchParams }) {
+export default async function LoginPage({ searchParams }) {
   const params = await searchParams
   const message = params?.message
 
   return (
     <>
-      <h2 className="text-2xl font-bold mb-6 text-gray-900 text-center">
-        Join Impact Golf
+      <h2 style={{
+        fontFamily: "'DM Serif Display', serif",
+        fontSize: '1.75rem', fontWeight: 400,
+        color: '#0f1a14', marginBottom: '6px', letterSpacing: '-0.01em'
+      }}>
+        Welcome back
       </h2>
+      <p style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '28px' }}>
+        Sign in to your account
+      </p>
 
-      <form className="space-y-6" action={signup}>
-        {message && (
-          <div className="p-4 rounded-md bg-red-50 text-red-600 border border-red-200 text-sm">
-            {message}
-          </div>
-        )}
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Full Name
-          </label>
-          <input
-            name="full_name"
-            type="text"
-            required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
+      {message && (
+        <div style={{
+          background: '#fef2f2', border: '1px solid #fecaca',
+          borderRadius: '8px', padding: '12px 14px',
+          color: '#dc2626', fontSize: '13px', marginBottom: '20px'
+        }}>
+          {message}
         </div>
+      )}
 
+      <form action={login} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>
             Email address
           </label>
           <input
             name="email"
             type="email"
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+            placeholder="you@example.com"
+            style={{
+              width: '100%', padding: '10px 14px',
+              border: '1px solid #e5e7eb', borderRadius: '8px',
+              fontSize: '14px', color: '#0f1a14',
+              outline: 'none', background: '#fff',
+              transition: 'border-color 0.15s'
+            }}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#374151', marginBottom: '6px' }}>
             Password
           </label>
           <input
             name="password"
             type="password"
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+            placeholder="••••••••"
+            style={{
+              width: '100%', padding: '10px 14px',
+              border: '1px solid #e5e7eb', borderRadius: '8px',
+              fontSize: '14px', color: '#0f1a14',
+              outline: 'none', background: '#fff'
+            }}
           />
         </div>
 
         <button
           type="submit"
-          className="w-full flex justify-center py-2 px-4 rounded-md text-white bg-rose-600 hover:bg-rose-700"
+          style={{
+            width: '100%', padding: '11px',
+            background: '#0f1a14', color: '#fff',
+            border: 'none', borderRadius: '8px',
+            fontSize: '14px', fontWeight: 600,
+            cursor: 'pointer', marginTop: '4px'
+          }}
         >
-          Create Account
+          Sign in
         </button>
       </form>
 
-      <div className="mt-6 text-center text-sm text-gray-600">
-        Already have an account?{' '}
-        <a href="/login" className="text-rose-600">
-          Sign in
+      <p style={{ textAlign: 'center', marginTop: '24px', fontSize: '13px', color: '#9ca3af' }}>
+        No account?{' '}
+        <a href="/signup" style={{ color: '#15803d', fontWeight: 500, textDecoration: 'none' }}>
+          Create one
         </a>
-      </div>
+      </p>
     </>
   )
 }

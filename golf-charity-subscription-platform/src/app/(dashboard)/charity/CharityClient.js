@@ -7,68 +7,120 @@ export default function CharityClient({ charities, profile }) {
   const [selectedId, setSelectedId] = useState(profile?.charity_id || '')
   const [percentage, setPercentage] = useState(profile?.charity_percentage || 10)
   const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  const selectedCharity = charities.find(c => c.id === selectedId)
 
   async function handleSubmit(e) {
     e.preventDefault()
     if (!selectedId) return
-
     setSaving(true)
     const formData = new FormData()
     formData.append('charity_id', selectedId)
     formData.append('charity_percentage', percentage)
     await updateCharityChoice(formData)
     setSaving(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 3000)
+  }
+
+  const getEmoji = (name) => {
+    const n = name?.toLowerCase() || ''
+    if (n.includes('ocean') || n.includes('sea') || n.includes('water')) return '🌊'
+    if (n.includes('golf') || n.includes('youth') || n.includes('sport')) return '⛳'
+    if (n.includes('green') || n.includes('earth') || n.includes('climate') || n.includes('tree')) return '🌳'
+    return '❤️'
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit}>
 
-      {/* Charity Cards */}
-      <div>
-        <h2 className="text-lg font-semibold text-gray-700 mb-4">Select a Charity</h2>
+      {saved && (
+        <div style={{
+          background: '#f0fdf4', border: '1px solid #bbf7d0',
+          borderRadius: '10px', padding: '14px 16px',
+          fontSize: '13px', color: '#15803d', marginBottom: '24px'
+        }}>
+          ✅ Saved! Your charity preferences have been updated.
+        </div>
+      )}
+
+      {/* Charity cards */}
+      <div style={{ marginBottom: '28px' }}>
+        <label style={{
+          display: 'block', fontSize: '12px', fontWeight: 600,
+          color: '#9ca3af', letterSpacing: '0.06em',
+          textTransform: 'uppercase', marginBottom: '14px'
+        }}>
+          Select charity
+        </label>
+
         {charities && charities.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {charities.map((c) => {
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
+            {charities.map(c => {
               const isSelected = selectedId === c.id
               return (
                 <button
                   key={c.id}
                   type="button"
                   onClick={() => setSelectedId(c.id)}
-                  className={`text-left p-5 rounded-xl border-2 transition-all shadow-sm hover:shadow-md ${
-                    isSelected
-                      ? 'border-emerald-500 bg-emerald-50 ring-2 ring-emerald-300'
-                      : 'border-gray-200 bg-white hover:border-emerald-300'
-                  }`}
+                  style={{
+                    textAlign: 'left', padding: '20px',
+                    borderRadius: '12px', cursor: 'pointer',
+                    border: isSelected ? '2px solid #15803d' : '1px solid #e5e7eb',
+                    background: isSelected ? '#f0fdf4' : '#fff',
+                    transition: 'all 0.15s',
+                    outline: 'none'
+                  }}
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-2xl">
-                      {c.name.toLowerCase().includes('ocean') ? '🌊' :
-                       c.name.toLowerCase().includes('golf') ? '⛳' :
-                       c.name.toLowerCase().includes('green') || c.name.toLowerCase().includes('earth') ? '🌳' : '❤️'}
-                    </span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+                    <span style={{ fontSize: '1.75rem' }}>{getEmoji(c.name)}</span>
                     {isSelected && (
-                      <span className="text-emerald-600 text-lg">✅</span>
+                      <span style={{
+                        width: '20px', height: '20px', borderRadius: '50%',
+                        background: '#15803d', display: 'flex',
+                        alignItems: 'center', justifyContent: 'center',
+                        fontSize: '11px', color: '#fff', flexShrink: 0
+                      }}>✓</span>
                     )}
                   </div>
-                  <p className="font-bold text-gray-800">{c.name}</p>
-                  <p className="text-sm text-gray-500 mt-1">{c.description}</p>
+                  <div style={{ fontWeight: 600, fontSize: '14px', color: '#0f1a14', marginBottom: '4px' }}>{c.name}</div>
+                  <div style={{ fontSize: '12px', color: '#9ca3af', lineHeight: 1.5 }}>{c.description}</div>
                 </button>
               )
             })}
           </div>
         ) : (
-          <div className="p-6 bg-gray-50 rounded-xl border-2 border-dashed text-center text-gray-400">
-            No charities available yet. Add one in Supabase under the <code>charities</code> table.
+          <div style={{
+            textAlign: 'center', padding: '40px',
+            background: '#fafafa', borderRadius: '12px',
+            border: '2px dashed #e5e7eb'
+          }}>
+            <p style={{ fontSize: '14px', color: '#9ca3af' }}>
+              No charities listed yet. Add one in Supabase under the <code>charities</code> table.
+            </p>
           </div>
         )}
       </div>
 
-      {/* Percentage Slider */}
-      <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-6">
-        <div className="flex justify-between items-center mb-3">
-          <h2 className="text-lg font-semibold text-gray-700">Your Contribution</h2>
-          <span className="text-3xl font-black text-emerald-600">{percentage}%</span>
+      {/* Slider */}
+      <div style={{
+        background: '#fff', border: '1px solid #e5e7eb',
+        borderRadius: '14px', padding: '24px', marginBottom: '24px'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+          <label style={{
+            fontSize: '12px', fontWeight: 600, color: '#9ca3af',
+            letterSpacing: '0.06em', textTransform: 'uppercase'
+          }}>
+            Contribution
+          </label>
+          <span style={{
+            fontFamily: "'DM Serif Display', serif",
+            fontSize: '2rem', color: '#0f1a14', letterSpacing: '-0.02em'
+          }}>
+            {percentage}%
+          </span>
         </div>
 
         <input
@@ -77,33 +129,39 @@ export default function CharityClient({ charities, profile }) {
           max="100"
           step="1"
           value={percentage}
-          onChange={(e) => setPercentage(Number(e.target.value))}
-          className="w-full h-2 bg-emerald-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+          onChange={e => setPercentage(Number(e.target.value))}
+          style={{ width: '100%', marginBottom: '10px' }}
         />
 
-        <div className="flex justify-between text-xs text-gray-400 mt-1">
-          <span>10% (minimum)</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#d1d5db', marginBottom: '12px' }}>
+          <span>10% min</span>
           <span>100%</span>
         </div>
 
-        <p className="text-sm text-emerald-700 mt-3">
-          <span className="font-semibold">{percentage}%</span> of your subscription will go to{' '}
-          {selectedId
-            ? <span className="font-semibold">{charities.find(c => c.id === selectedId)?.name || 'your selected charity'}</span>
-            : <span className="text-gray-400">your selected charity</span>
-          }
+        <p style={{ fontSize: '13px', color: '#6b7280' }}>
+          <strong style={{ color: '#0f1a14' }}>{percentage}%</strong> of your subscription will go to{' '}
+          <strong style={{ color: '#15803d' }}>
+            {selectedCharity?.name || 'your selected charity'}
+          </strong>
         </p>
       </div>
 
-      {/* Save Button */}
+      {/* Submit */}
       <button
         type="submit"
         disabled={!selectedId || saving}
-        className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl font-bold text-lg transition-colors shadow-sm"
+        style={{
+          width: '100%', padding: '13px',
+          background: !selectedId || saving ? '#e5e7eb' : '#0f1a14',
+          color: !selectedId || saving ? '#9ca3af' : '#fff',
+          border: 'none', borderRadius: '10px',
+          fontSize: '14px', fontWeight: 600,
+          cursor: !selectedId || saving ? 'not-allowed' : 'pointer',
+          transition: 'background 0.15s'
+        }}
       >
-        {saving ? 'Saving...' : !selectedId ? 'Select a charity to continue' : 'Save My Impact Choice'}
+        {saving ? 'Saving...' : !selectedId ? 'Select a charity to continue' : 'Save preferences'}
       </button>
-
     </form>
   )
 }

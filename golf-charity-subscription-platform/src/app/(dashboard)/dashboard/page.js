@@ -5,7 +5,6 @@ export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
-
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
@@ -23,96 +22,200 @@ export default async function DashboardPage() {
     .limit(1)
     .maybeSingle()
 
-  const isActive = sub?.status === 'active' || sub?.status === 'trialing'
-
   const { data: scores } = await supabase
     .from('scores')
-    .select('score')
+    .select('score, played_date')
     .eq('user_id', user.id)
     .order('played_date', { ascending: false })
     .limit(5)
 
-  const avgScore = scores && scores.length > 0
-    ? Math.round(scores.reduce((acc, s) => acc + s.score, 0) / scores.length)
+  const isActive = sub?.status === 'active' || sub?.status === 'trialing'
+  const avgScore = scores?.length
+    ? Math.round(scores.reduce((a, s) => a + s.score, 0) / scores.length)
     : null
 
+  const firstName = profile?.full_name?.split(' ')[0] || 'there'
+
   return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm p-6 border-t-4 border-rose-500">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Welcome back{profile?.full_name ? `, ${profile.full_name}` : ''}!
+    <div>
+      {/* Header */}
+      <div style={{ marginBottom: '32px' }}>
+        <h1 style={{
+          fontFamily: "'DM Serif Display', serif",
+          fontSize: '2rem', fontWeight: 400,
+          color: '#0f1a14', letterSpacing: '-0.02em', marginBottom: '6px'
+        }}>
+          Hey, {firstName} 👋
         </h1>
-        <p className="text-gray-500 mt-1">
-          Signed in as: <span className="font-mono bg-gray-100 px-2 rounded text-sm">{user.email}</span>
+        <p style={{ color: '#9ca3af', fontSize: '14px' }}>
+          Here&apos;s your platform overview
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Subscription Status */}
-        <div className={`border rounded-lg p-6 shadow-sm ${isActive ? 'bg-rose-50 border-rose-200' : 'bg-gray-50 border-gray-200'}`}>
-          <h3 className="font-bold text-lg mb-2 text-rose-600">Subscription</h3>
-          <p className="text-gray-500 text-sm mb-1">
-            Status: <span className={`font-bold ${isActive ? 'text-emerald-600' : 'text-gray-700'}`}>
-              {sub?.status ? sub.status.charAt(0).toUpperCase() + sub.status.slice(1) : 'Inactive'}
+      {/* Cards grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px', marginBottom: '28px' }}>
+
+        {/* Subscription */}
+        <div style={{
+          background: '#fff', border: '1px solid #e5e7eb',
+          borderRadius: '14px', padding: '24px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+            <span style={{ fontSize: '13px', color: '#9ca3af', fontWeight: 500 }}>Subscription</span>
+            <span style={{
+              padding: '3px 10px', borderRadius: '99px', fontSize: '12px', fontWeight: 600,
+              background: isActive ? '#dcfce7' : '#f3f4f6',
+              color: isActive ? '#15803d' : '#6b7280'
+            }}>
+              {isActive ? 'Active' : 'Inactive'}
             </span>
-          </p>
-          {isActive && sub?.plan_type && (
-            <p className="text-xs text-gray-500 mb-3 capitalize">{sub.plan_type} plan</p>
-          )}
-          {!isActive ? (
-            <a
-              href="/subscribe"
-              className="inline-block px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded text-sm font-medium mt-2"
-            >
-              Start Subscription →
-            </a>
+          </div>
+          {isActive ? (
+            <>
+              <div style={{
+                fontFamily: "'DM Serif Display', serif",
+                fontSize: '1.5rem', color: '#0f1a14', marginBottom: '6px', textTransform: 'capitalize'
+              }}>
+                {sub.plan_type} plan
+              </div>
+              <div style={{ fontSize: '12px', color: '#9ca3af' }}>
+                Renews {new Date(sub.current_period_end).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </div>
+            </>
           ) : (
-            <p className="text-xs text-rose-500 mt-2">
-              Renews {new Date(sub.current_period_end).toLocaleDateString()}
-            </p>
+            <>
+              <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '16px' }}>
+                No active plan
+              </div>
+              <a href="/subscribe" style={{
+                display: 'inline-block', padding: '8px 16px',
+                background: '#0f1a14', color: '#fff',
+                borderRadius: '8px', fontSize: '13px',
+                fontWeight: 600, textDecoration: 'none'
+              }}>
+                Subscribe →
+              </a>
+            </>
           )}
         </div>
 
-        {/* Charity Impact */}
-        <div className="border border-emerald-200 rounded-lg p-6 bg-emerald-50 shadow-sm">
-          <h3 className="font-bold text-lg mb-2 text-emerald-600">Your Impact</h3>
+        {/* Charity */}
+        <div style={{
+          background: '#fff', border: '1px solid #e5e7eb',
+          borderRadius: '14px', padding: '24px'
+        }}>
+          <div style={{ fontSize: '13px', color: '#9ca3af', fontWeight: 500, marginBottom: '16px' }}>Charity Impact</div>
           {profile?.charities ? (
             <>
-              <p className="text-gray-700 font-medium">{profile.charities.name}</p>
-              <p className="text-gray-500 text-sm">
-                Contributing {profile.charity_percentage}%
-              </p>
+              <div style={{
+                fontFamily: "'DM Serif Display', serif",
+                fontSize: '1.35rem', color: '#0f1a14', marginBottom: '6px'
+              }}>
+                {profile.charities.name}
+              </div>
+              <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '16px' }}>
+                Contributing {profile.charity_percentage}% of subscription
+              </div>
+              <a href="/charity" style={{ fontSize: '13px', color: '#15803d', fontWeight: 500, textDecoration: 'none' }}>
+                Change charity →
+              </a>
             </>
           ) : (
-            <p className="text-gray-500 text-sm">No charity selected yet.</p>
+            <>
+              <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '16px' }}>
+                No charity selected
+              </div>
+              <a href="/charity" style={{
+                display: 'inline-block', padding: '8px 16px',
+                background: '#f0fdf4', color: '#15803d',
+                border: '1px solid #bbf7d0',
+                borderRadius: '8px', fontSize: '13px',
+                fontWeight: 600, textDecoration: 'none'
+              }}>
+                Choose charity →
+              </a>
+            </>
           )}
-          <a
-            href="/charity"
-            className="inline-block mt-4 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded text-sm font-medium"
-          >
-            {profile?.charities ? 'Change Charity' : 'Choose Charity'} →
-          </a>
         </div>
 
         {/* Scores */}
-        <div className="border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
-          <h3 className="font-bold text-lg mb-2 text-gray-700">My Scores</h3>
+        <div style={{
+          background: '#fff', border: '1px solid #e5e7eb',
+          borderRadius: '14px', padding: '24px'
+        }}>
+          <div style={{ fontSize: '13px', color: '#9ca3af', fontWeight: 500, marginBottom: '16px' }}>My Scores</div>
           {avgScore !== null ? (
             <>
-              <p className="text-3xl font-black text-rose-500">{avgScore}</p>
-              <p className="text-xs text-gray-400">avg Stableford (last {scores.length})</p>
+              <div style={{
+                fontFamily: "'DM Serif Display', serif",
+                fontSize: '2.5rem', color: '#0f1a14', letterSpacing: '-0.02em', marginBottom: '4px'
+              }}>
+                {avgScore}
+              </div>
+              <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '16px' }}>
+                Avg Stableford · {scores.length}/5 rounds stored
+              </div>
+              <a href="/scores" style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500, textDecoration: 'none' }}>
+                Add score →
+              </a>
             </>
           ) : (
-            <p className="text-gray-500 text-sm">No scores submitted yet.</p>
+            <>
+              <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '16px' }}>
+                No scores yet
+              </div>
+              <a href="/scores" style={{
+                display: 'inline-block', padding: '8px 16px',
+                background: '#f9fafb', color: '#374151',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px', fontSize: '13px',
+                fontWeight: 600, textDecoration: 'none'
+              }}>
+                Submit first score →
+              </a>
+            </>
           )}
-          <a
-            href="/scores"
-            className="inline-block mt-4 px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded text-sm font-medium"
-          >
-            {avgScore !== null ? 'Add Score' : 'Submit First Score'} →
-          </a>
         </div>
       </div>
+
+      {/* Recent scores mini table */}
+      {scores && scores.length > 0 && (
+        <div style={{
+          background: '#fff', border: '1px solid #e5e7eb',
+          borderRadius: '14px', padding: '24px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <span style={{ fontWeight: 600, color: '#0f1a14', fontSize: '14px' }}>Recent rounds</span>
+            <a href="/scores" style={{ fontSize: '13px', color: '#9ca3af', textDecoration: 'none' }}>View all →</a>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {scores.map((s, i) => (
+              <div key={i} style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '10px 0',
+                borderBottom: i < scores.length - 1 ? '1px solid #f3f4f6' : 'none'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{
+                    width: '28px', height: '28px', borderRadius: '7px',
+                    background: i === 0 ? '#f0fdf4' : '#f9fafb',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '11px', fontWeight: 700,
+                    color: i === 0 ? '#15803d' : '#9ca3af'
+                  }}>#{i + 1}</span>
+                  <span style={{ fontSize: '13px', color: '#6b7280' }}>
+                    {new Date(s.played_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </span>
+                </div>
+                <span style={{
+                  fontFamily: "'DM Serif Display', serif",
+                  fontSize: '1.25rem', color: '#0f1a14'
+                }}>{s.score}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

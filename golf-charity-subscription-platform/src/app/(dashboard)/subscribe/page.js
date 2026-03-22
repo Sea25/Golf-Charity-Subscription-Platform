@@ -6,81 +6,128 @@ export default async function SubscribePage(props) {
   const isSuccess = searchParams?.success
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6 max-w-5xl mx-auto">
-      <div className="text-center mb-12 mt-8">
-        <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
-          Choose Your Impact Plan
+    <div>
+      <div style={{ marginBottom: '40px' }}>
+        <h1 style={{
+          fontFamily: "'DM Serif Display', serif",
+          fontSize: '2rem', fontWeight: 400,
+          color: '#0f1a14', letterSpacing: '-0.02em', marginBottom: '6px'
+        }}>
+          Choose a plan
         </h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Unlock the platform and support your favorite charity.
+        <p style={{ color: '#9ca3af', fontSize: '14px' }}>
+          Subscribe to unlock scores, draws, and charity giving.
         </p>
 
         {isCanceled && (
-          <div className="mt-4 p-4 rounded-md bg-amber-50 text-amber-600 border border-amber-200 text-sm max-w-md mx-auto">
-            Checkout was canceled. We hope you&apos;ll subscribe when you&apos;re ready!
+          <div style={{
+            marginTop: '16px', background: '#fffbeb', border: '1px solid #fde68a',
+            borderRadius: '10px', padding: '12px 16px',
+            fontSize: '13px', color: '#92400e', maxWidth: '420px'
+          }}>
+            Checkout was canceled — no charge was made.
           </div>
         )}
-
         {isSuccess && (
-          <div className="mt-4 p-4 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-200 text-sm max-w-md mx-auto">
-            🎉 Welcome to Impact Golf! Your subscription is now active.
+          <div style={{
+            marginTop: '16px', background: '#f0fdf4', border: '1px solid #bbf7d0',
+            borderRadius: '10px', padding: '12px 16px',
+            fontSize: '13px', color: '#15803d', maxWidth: '420px'
+          }}>
+            🎉 You&apos;re subscribed! Welcome to Impact Golf.
           </div>
         )}
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-        {/* Monthly */}
-        <div className="p-8 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-          <h3 className="text-2xl font-bold">Monthly Plan</h3>
-          <p className="mt-4 text-5xl font-extrabold">
-            $15<span className="text-xl text-gray-500 font-normal">/mo</span>
-          </p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', maxWidth: '680px' }}>
 
-          <ul className="mt-6 space-y-3 mb-8 text-gray-600">
-            <li>✔️ Minimum 10% to charity</li>
-            <li>✔️ Entry into monthly draws</li>
-            <li>✔️ Track your scores</li>
+        {/* Monthly */}
+        <div style={{
+          background: '#fff', border: '1px solid #e5e7eb',
+          borderRadius: '16px', padding: '32px', display: 'flex', flexDirection: 'column'
+        }}>
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: '#9ca3af', marginBottom: '12px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Monthly</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+              <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: '3rem', color: '#0f1a14', letterSpacing: '-0.03em' }}>$15</span>
+              <span style={{ fontSize: '14px', color: '#9ca3af' }}>/month</span>
+            </div>
+          </div>
+
+          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {['10%+ to your chosen charity', 'Monthly prize draw entry', 'Score tracking (5 rounds)', 'Cancel anytime'].map(f => (
+              <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#6b7280' }}>
+                <span style={{ color: '#22c55e', fontSize: '14px', fontWeight: 700, flexShrink: 0 }}>✓</span>
+                {f}
+              </li>
+            ))}
           </ul>
 
-          <form action={createCheckoutSession}>
+          <form action={createCheckoutSession} style={{ marginTop: 'auto' }}>
             <input type="hidden" name="plan_type" value="monthly" />
-            <button
-              type="submit"
-              className="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 py-3 rounded-xl font-bold transition-colors"
-            >
-              Subscribe Monthly
+            <button type="submit" style={{
+              width: '100%', padding: '12px',
+              background: '#f3f4f6', color: '#0f1a14',
+              border: '1px solid #e5e7eb', borderRadius: '9px',
+              fontSize: '14px', fontWeight: 600, cursor: 'pointer',
+              fontFamily: "'DM Sans', sans-serif"
+            }}>
+              Subscribe monthly
             </button>
           </form>
         </div>
 
         {/* Yearly */}
-        <div className="p-8 bg-rose-50 border-2 border-rose-500 rounded-2xl shadow-md hover:shadow-lg transition-shadow relative">
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-rose-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
+        <div style={{
+          background: '#0f1a14', border: '1px solid #0f1a14',
+          borderRadius: '16px', padding: '32px', display: 'flex', flexDirection: 'column',
+          position: 'relative'
+        }}>
+          <div style={{
+            position: 'absolute', top: '-12px', left: '24px',
+            background: '#22c55e', color: '#0f1a14',
+            padding: '4px 12px', borderRadius: '99px',
+            fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em'
+          }}>
             BEST VALUE
           </div>
-          <h3 className="text-2xl font-bold">Yearly Plan</h3>
-          <p className="mt-4 text-5xl font-extrabold">
-            $150<span className="text-xl text-gray-500 font-normal">/yr</span>
-          </p>
-          <p className="text-sm text-rose-600 font-medium mt-1">Save $30 — 2 months free!</p>
 
-          <ul className="mt-4 space-y-3 mb-8 text-gray-600">
-            <li>✔️ Minimum 10% to charity</li>
-            <li>✔️ Entry into monthly draws</li>
-            <li>✔️ 2 Months Free</li>
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '12px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Yearly</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', flexWrap: 'wrap' }}>
+              <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: '3rem', color: '#fff', letterSpacing: '-0.03em' }}>$150</span>
+              <span style={{ fontSize: '14px', color: '#6b7280' }}>/year</span>
+            </div>
+            <div style={{ fontSize: '12px', color: '#4ade80', marginTop: '4px' }}>2 months free — save $30</div>
+          </div>
+
+          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {['10%+ to your chosen charity', 'Monthly prize draw entry', 'Score tracking (5 rounds)', '2 months free vs monthly'].map(f => (
+              <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#9ca3af' }}>
+                <span style={{ color: '#4ade80', fontSize: '14px', fontWeight: 700, flexShrink: 0 }}>✓</span>
+                {f}
+              </li>
+            ))}
           </ul>
 
-          <form action={createCheckoutSession}>
+          <form action={createCheckoutSession} style={{ marginTop: 'auto' }}>
             <input type="hidden" name="plan_type" value="yearly" />
-            <button
-              type="submit"
-              className="w-full bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-bold transition-colors"
-            >
-              Subscribe Yearly
+            <button type="submit" style={{
+              width: '100%', padding: '12px',
+              background: '#22c55e', color: '#0f1a14',
+              border: 'none', borderRadius: '9px',
+              fontSize: '14px', fontWeight: 700, cursor: 'pointer',
+              fontFamily: "'DM Sans', sans-serif"
+            }}>
+              Subscribe yearly
             </button>
           </form>
         </div>
       </div>
+
+      <p style={{ marginTop: '20px', fontSize: '12px', color: '#9ca3af', maxWidth: '560px' }}>
+        Secure payment via Stripe. Cancel anytime. A minimum of 10% of your subscription goes directly to your chosen charity.
+      </p>
     </div>
   )
 }

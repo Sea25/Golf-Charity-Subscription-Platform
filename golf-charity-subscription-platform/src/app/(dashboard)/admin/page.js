@@ -1,155 +1,133 @@
-import { createClient } from '@/utils/supabase/server'
-import { supabaseAdmin } from '@/utils/supabase/admin'
-import { redirect } from 'next/navigation'
-import { runMonthlyDraw } from './actions'
+import { createCheckoutSession } from './actions'
 
-export const dynamic = 'force-dynamic'
-
-export default async function AdminDrawPage(props) {
+export default async function SubscribePage(props) {
   const searchParams = props.searchParams ? await props.searchParams : {}
-  const status = searchParams.status
-  const message = searchParams.message
-
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) redirect('/login')
-
-  const isAdmin =
-    user.email === process.env.ADMIN_EMAIL ||
-    user.email === 'admin@impactgolf.com'
-  
-  if (!isAdmin) {
-    return (
-      <div className="p-8 text-center bg-white rounded-xl shadow-sm border border-rose-100 max-w-xl mx-auto mt-12">
-        <h1 className="text-2xl font-bold text-gray-800">Access Denied</h1>
-        <p className="text-gray-500 mt-2">You must be an admin to view this page.</p>
-        <p className="text-emerald-600 mt-4 text-sm font-mono">Current User: {user.email}</p>
-        <p className="text-gray-400 mt-2 text-xs">
-          Set ADMIN_EMAIL in your .env.local to match your email.
-        </p>
-      </div>
-    )
-  }
-
-  let draws = []
-  let tableMissingError = false
-  
-  const { data: fetchedDraws, error } = await supabaseAdmin
-    .from('draws')
-    .select('*')
-    .order('created_at', { ascending: false })
-    
-  if (error) {
-    if (error.code === '42P01') {
-      tableMissingError = true
-    } else {
-      console.error('Error fetching draws:', error.message)
-    }
-  } else {
-    draws = fetchedDraws || []
-  }
-
-  const { count: activeSubsCount } = await supabaseAdmin
-    .from('subscriptions')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'active')
+  const isCanceled = searchParams?.canceled
+  const isSuccess = searchParams?.success
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border-t-4 border-emerald-500 p-8 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Admin Controls</h1>
-        <p className="text-gray-500 mt-1">Manage the platform and run the monthly subscriber draws.</p>
-        <p className="text-sm text-gray-400 mt-1">Logged in as: <span className="font-mono">{user.email}</span></p>
-      </div>
-
-      {message && (
-        <div className={`p-4 rounded-lg mb-8 border ${
-          status === 'success'
-            ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-            : 'bg-rose-50 border-rose-200 text-rose-800'
-        }`}>
-          <h3 className="font-bold flex items-center gap-2">
-            {status === 'success' ? '✅ Success' : '⚠️ Attention Required'}
-          </h3>
-          <p className="mt-1 text-sm">{message}</p>
-        </div>
-      )}
-
-      {tableMissingError && (
-        <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-lg mb-8">
-          <h3 className="font-bold">⚠️ Database Setup Required</h3>
-          <p className="text-sm mt-1">
-            The <code className="bg-amber-100 px-1 rounded">draws</code> table is missing.
-            Run the SQL from <code>supabase_schema.sql</code> in your Supabase SQL Editor.
-          </p>
-        </div>
-      )}
-
-      <div className="grid grid-cols-2 gap-4 mb-8">
-        <div className="bg-rose-50 rounded-lg p-4 border border-rose-100">
-          <p className="text-sm text-rose-600 font-medium">Active Subscribers</p>
-          <p className="text-3xl font-bold text-rose-700">{activeSubsCount ?? 0}</p>
-        </div>
-        <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-100">
-          <p className="text-sm text-emerald-600 font-medium">Draws Run</p>
-          <p className="text-3xl font-bold text-emerald-700">{draws.length}</p>
-        </div>
-      </div>
-
-      <div className="bg-emerald-50 p-6 rounded-lg border border-emerald-100 mb-8 max-w-lg shadow-sm">
-        <h2 className="text-xl font-bold text-emerald-800 mb-2">Monthly Draw Utility</h2>
-        <p className="text-emerald-700 text-sm mb-4 leading-relaxed">
-          Randomly select a winner from all currently <strong>active</strong> subscribers.
-          One draw per month — already-run months are blocked.
+    <div>
+      <div style={{ marginBottom: '40px' }}>
+        <h1 style={{
+          fontFamily: "'DM Serif Display', serif",
+          fontSize: '2rem', fontWeight: 400,
+          color: '#0f1a14', letterSpacing: '-0.02em', marginBottom: '6px'
+        }}>
+          Choose a plan
+        </h1>
+        <p style={{ color: '#9ca3af', fontSize: '14px' }}>
+          Subscribe to unlock scores, draws, and charity giving.
         </p>
 
-        <form action={runMonthlyDraw}>
-          <button 
-            type="submit" 
-            disabled={tableMissingError}
-            className="bg-emerald-500 disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-emerald-600 text-white px-6 py-2.5 rounded-lg font-medium shadow-sm transition-colors w-full sm:w-auto"
-          >
-            Run Monthly Draw
-          </button>
-        </form>
-      </div>
-
-      <div>
-        <h2 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Past Winners Log</h2>
-        {draws && draws.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 border rounded-lg overflow-hidden">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Draw Month</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Winner Profile ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Logged</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {draws.map((draw) => (
-                  <tr key={draw.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-emerald-600">
-                      {draw.draw_month}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500">
-                      {draw.winner_id || 'N/A'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(draw.created_at).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {isCanceled && (
+          <div style={{
+            marginTop: '16px', background: '#fffbeb', border: '1px solid #fde68a',
+            borderRadius: '10px', padding: '12px 16px',
+            fontSize: '13px', color: '#92400e', maxWidth: '420px'
+          }}>
+            Checkout was canceled — no charge was made.
           </div>
-        ) : (
-          <p className="text-gray-500 italic bg-gray-50 p-5 rounded-lg border text-center text-sm shadow-inner">
-            No draws recorded yet. Click the button above to run the first draw!
-          </p>
+        )}
+        {isSuccess && (
+          <div style={{
+            marginTop: '16px', background: '#f0fdf4', border: '1px solid #bbf7d0',
+            borderRadius: '10px', padding: '12px 16px',
+            fontSize: '13px', color: '#15803d', maxWidth: '420px'
+          }}>
+            🎉 You&apos;re subscribed! Welcome to Impact Golf.
+          </div>
         )}
       </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', maxWidth: '680px' }}>
+
+        {/* Monthly */}
+        <div style={{
+          background: '#fff', border: '1px solid #e5e7eb',
+          borderRadius: '16px', padding: '32px', display: 'flex', flexDirection: 'column'
+        }}>
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: '#9ca3af', marginBottom: '12px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Monthly</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+              <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: '3rem', color: '#0f1a14', letterSpacing: '-0.03em' }}>$15</span>
+              <span style={{ fontSize: '14px', color: '#9ca3af' }}>/month</span>
+            </div>
+          </div>
+
+          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {['10%+ to your chosen charity', 'Monthly prize draw entry', 'Score tracking (5 rounds)', 'Cancel anytime'].map(f => (
+              <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#6b7280' }}>
+                <span style={{ color: '#22c55e', fontSize: '14px', fontWeight: 700, flexShrink: 0 }}>✓</span>
+                {f}
+              </li>
+            ))}
+          </ul>
+
+          <form action={createCheckoutSession} style={{ marginTop: 'auto' }}>
+            <input type="hidden" name="plan_type" value="monthly" />
+            <button type="submit" style={{
+              width: '100%', padding: '12px',
+              background: '#f3f4f6', color: '#0f1a14',
+              border: '1px solid #e5e7eb', borderRadius: '9px',
+              fontSize: '14px', fontWeight: 600, cursor: 'pointer',
+              fontFamily: "'DM Sans', sans-serif"
+            }}>
+              Subscribe monthly
+            </button>
+          </form>
+        </div>
+
+        {/* Yearly */}
+        <div style={{
+          background: '#0f1a14', border: '1px solid #0f1a14',
+          borderRadius: '16px', padding: '32px', display: 'flex', flexDirection: 'column',
+          position: 'relative'
+        }}>
+          <div style={{
+            position: 'absolute', top: '-12px', left: '24px',
+            background: '#22c55e', color: '#0f1a14',
+            padding: '4px 12px', borderRadius: '99px',
+            fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em'
+          }}>
+            BEST VALUE
+          </div>
+
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '12px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Yearly</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', flexWrap: 'wrap' }}>
+              <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: '3rem', color: '#fff', letterSpacing: '-0.03em' }}>$150</span>
+              <span style={{ fontSize: '14px', color: '#6b7280' }}>/year</span>
+            </div>
+            <div style={{ fontSize: '12px', color: '#4ade80', marginTop: '4px' }}>2 months free — save $30</div>
+          </div>
+
+          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {['10%+ to your chosen charity', 'Monthly prize draw entry', 'Score tracking (5 rounds)', '2 months free vs monthly'].map(f => (
+              <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#9ca3af' }}>
+                <span style={{ color: '#4ade80', fontSize: '14px', fontWeight: 700, flexShrink: 0 }}>✓</span>
+                {f}
+              </li>
+            ))}
+          </ul>
+
+          <form action={createCheckoutSession} style={{ marginTop: 'auto' }}>
+            <input type="hidden" name="plan_type" value="yearly" />
+            <button type="submit" style={{
+              width: '100%', padding: '12px',
+              background: '#22c55e', color: '#0f1a14',
+              border: 'none', borderRadius: '9px',
+              fontSize: '14px', fontWeight: 700, cursor: 'pointer',
+              fontFamily: "'DM Sans', sans-serif"
+            }}>
+              Subscribe yearly
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <p style={{ marginTop: '20px', fontSize: '12px', color: '#9ca3af', maxWidth: '560px' }}>
+        Secure payment via Stripe. Cancel anytime. A minimum of 10% of your subscription goes directly to your chosen charity.
+      </p>
     </div>
   )
 }
