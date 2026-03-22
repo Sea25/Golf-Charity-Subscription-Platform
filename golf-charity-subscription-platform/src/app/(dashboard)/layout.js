@@ -8,6 +8,8 @@ export default async function DashboardLayout({ children }) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const isAdmin = user.email === process.env.ADMIN_EMAIL
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Dashboard Navigation */}
@@ -30,10 +32,19 @@ export default async function DashboardLayout({ children }) {
                 <Link href="/charity" className="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 font-medium">
                   My Charity
                 </Link>
+                <Link href="/subscribe" className="text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 font-medium">
+                  Subscribe
+                </Link>
+                {isAdmin && (
+                  <Link href="/admin" className="text-emerald-600 hover:text-emerald-800 inline-flex items-center px-1 pt-1 font-medium">
+                    Admin
+                  </Link>
+                )}
               </div>
             </div>
 
-            <div className="flex items-center">
+            <div className="flex items-center gap-4">
+              <span className="text-xs text-gray-400 hidden sm:block">{user.email}</span>
               <form action="/auth/signout" method="POST">
                 <button type="submit" className="text-sm text-gray-500 hover:text-gray-700">
                   Sign Out

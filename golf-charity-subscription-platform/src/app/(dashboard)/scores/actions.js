@@ -2,20 +2,25 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
 export async function addScore(formData) {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    throw new Error('Not authenticated')
+    redirect('/login')
   }
 
   const scoreValue = parseInt(formData.get('score'))
   const playedDate = formData.get('played_date')
 
   if (isNaN(scoreValue) || scoreValue < 1 || scoreValue > 45) {
-    return { error: 'Score must be between 1 and 45' }
+    redirect('/scores?message=Score+must+be+between+1+and+45')
+  }
+
+  if (!playedDate) {
+    redirect('/scores?message=Please+select+a+date')
   }
 
   const { error } = await supabase
@@ -30,12 +35,9 @@ export async function addScore(formData) {
 
   if (error) {
     console.error('Error inserting score:', error)
-    return { error: 'Could not save your score.' }
+    redirect('/scores?message=Could+not+save+your+score')
   }
 
   revalidatePath('/scores')
-
-  
-  
-  return { success: true }
+  redirect('/scores?success=true')
 }
