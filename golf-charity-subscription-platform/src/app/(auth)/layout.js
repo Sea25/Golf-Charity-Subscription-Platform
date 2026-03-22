@@ -1,13 +1,9 @@
 import Link from 'next/link'
-<<<<<<< HEAD
-=======
 
->>>>>>> 439dc91c3d863ceacfe4d48f68c76629aefb2f4c
 export default function AuthLayout({ children }) {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-<<<<<<< HEAD
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">IMPACT GOLF</h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           <Link href="/" className="font-medium text-rose-500 hover:text-rose-400">&larr; Back to Home</Link>
@@ -15,7 +11,6 @@ export default function AuthLayout({ children }) {
       </div>
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">{children}</div>
-=======
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           IMPACT GOLF
         </h2>
@@ -30,7 +25,6 @@ export default function AuthLayout({ children }) {
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {children}
         </div>
->>>>>>> 439dc91c3d863ceacfe4d48f68c76629aefb2f4c
       </div>
     </div>
   )

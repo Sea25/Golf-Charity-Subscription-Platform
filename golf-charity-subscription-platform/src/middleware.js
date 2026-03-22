@@ -1,13 +1,4 @@
-<<<<<<< HEAD
 import { updateSession } from './utils/supabase/middleware'
-
-export async function middleware(request) {
-  return await updateSession(request)
-}
-export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
-=======
-import { updateSession } from '@/utils/supabase/middleware'
 
 export async function middleware(request) {
   // Update user's auth session
@@ -24,5 +15,4 @@ export const config = {
      */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
->>>>>>> 439dc91c3d863ceacfe4d48f68c76629aefb2f4c
 }

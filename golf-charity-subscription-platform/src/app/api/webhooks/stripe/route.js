@@ -1,165 +1,124 @@
-<<<<<<< HEAD
 import { NextResponse } from 'next/server'
-=======
-import Stripe from 'stripe'
-import { NextResponse } from 'next/server'
-import { headers } from 'next/headers'
->>>>>>> 439dc91c3d863ceacfe4d48f68c76629aefb2f4c
 import { stripe } from '@/utils/stripe/server'
 import { supabaseAdmin } from '@/utils/supabase/admin'
 
 export async function POST(req) {
   const body = await req.text()
-<<<<<<< HEAD
   const sig = req.headers.get('stripe-signature')
+
   let event
 
-  try { 
-    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET) 
-  } catch (err) { 
+  try {
+    event = stripe.webhooks.constructEvent(
+      body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    )
+  } catch (err) {
     console.error(`⚠️ Webhook error: ${err.message}`)
-    console.error(`1️⃣ Signature: ${sig}`)
-    console.error(`2️⃣ Secret available? ${!!process.env.STRIPE_WEBHOOK_SECRET}`)
-    console.error(`3️⃣ Body length: ${body?.length}`)
-    return NextResponse.json({ error: err.message }, { status: 400 }) 
+    return NextResponse.json({ error: err.message }, { status: 400 })
   }
 
   console.log(`🔔 Webhook accepted! Event type: ${event.type}`)
 
+  // ✅ Checkout completed
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object
+
     if (session.client_reference_id && session.customer) {
-      const { error } = await supabaseAdmin.from('profiles').update({ stripe_customer_id: session.customer }).eq('id', session.client_reference_id)
+      const { error } = await supabaseAdmin
+        .from('profiles')
+        .update({ stripe_customer_id: session.customer })
+        .eq('id', session.client_reference_id)
+
       if (error) {
-        console.error('❌ Failed to update profile with customer ID:', error.message)
-      } else {
-        console.log(`✅ Profile updated with Stripe customer ID: ${session.customer}`)
+        console.error('❌ Failed to update profile:', error.message)
       }
 
-      // Fix race condition: Insert subscription immediately using checkout session data
       if (session.subscription) {
         try {
           const sub = await stripe.subscriptions.retrieve(session.subscription)
-          const planType = sub.items.data[0].plan.interval === 'month' ? 'monthly' : 'yearly'
-          const { error: subErr } = await supabaseAdmin.from('subscriptions').upsert({
-            id: sub.id, user_id: session.client_reference_id, status: sub.status, plan_type: planType,
-            current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
-            current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
-            cancel_at_period_end: sub.cancel_at_period_end
-          })
-          if (subErr) console.error('❌ Failed to upsert subscription from checkout:', subErr.message)
-          else console.log(`✅ Subscription ${sub.id} explicitly created from checkout session!`)
-        } catch (subFetchErr) {
-          console.error(`⚠️ Could not retrieve subscription ${session.subscription}:`, subFetchErr.message)
+
+          const planType =
+            sub.items.data[0].plan.interval === 'month'
+              ? 'monthly'
+              : 'yearly'
+
+          const { error: subErr } = await supabaseAdmin
+            .from('subscriptions')
+            .upsert({
+              id: sub.id,
+              user_id: session.client_reference_id,
+              status: sub.status,
+              plan_type: planType,
+              current_period_start: new Date(
+                sub.current_period_start * 1000
+              ).toISOString(),
+              current_period_end: new Date(
+                sub.current_period_end * 1000
+              ).toISOString(),
+              cancel_at_period_end: sub.cancel_at_period_end,
+            })
+
+          if (subErr) {
+            console.error('❌ Failed to upsert subscription:', subErr.message)
+          }
+        } catch (err) {
+          console.error('⚠️ Subscription fetch error:', err.message)
         }
       }
-    } else {
-      console.warn('⚠️ Missing client_reference_id or customer in session')
     }
   }
 
-  if (['customer.subscription.created', 'customer.subscription.updated', 'customer.subscription.deleted'].includes(event.type)) {
+  // ✅ Subscription updates
+  if (
+    event.type === 'customer.subscription.created' ||
+    event.type === 'customer.subscription.updated' ||
+    event.type === 'customer.subscription.deleted'
+  ) {
     const sub = event.data.object
-    
-    // 1. Try metadata first (most reliable, avoids race condition!)
+
     let userId = sub.metadata?.userId
-    
-    // 2. Fallback to profile lookup
+
     if (!userId) {
-      const { data: profile } = await supabaseAdmin.from('profiles').select('id').eq('stripe_customer_id', sub.customer).single()
-      if (profile) userId = profile.id
-    }
-    
-    if (!userId) {
-      console.error(`⚠️ Cannot find user for subscription. Metadata missing and profile not found for customer: ${sub.customer}`)
-    } else {
-      const planType = sub.items.data[0].plan.interval === 'month' ? 'monthly' : 'yearly'
-      const { error: upsertError } = await supabaseAdmin.from('subscriptions').upsert({
-        id: sub.id, user_id: userId, status: sub.status, plan_type: planType,
-        current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
-        current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
-        cancel_at_period_end: sub.cancel_at_period_end
-      })
-      if (upsertError) {
-        console.error('❌ Failed to upsert subscription in sub event:', upsertError.message)
-      } else {
-        console.log(`✅ Subscription ${sub.id} upserted securely via ${event.type}. Status: ${sub.status}`)
-      }
-    }
-  }
-  return NextResponse.json({ received: true })
-=======
-  const headersList = await headers()
-  const signature = headersList.get('stripe-signature')
-
-  let event
-
-  // 1. Verify the Stripe Webhook Signature is legit
-  try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET
-    )
-  } catch (error) {
-    console.error('Webhook signature verification failed:', error.message)
-    return NextResponse.json({ error: error.message }, { status: 400 })
-  }
-
-  try {
-    // 2. Handle the "Checkout Completed" event
-    // This happens the first time they ever buy a subscription using our Checkout Page
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object
-      const userId = session.client_reference_id
-      const customerId = session.customer
-
-      // Save their Stripe Customer ID to their Supabase Profile!
-      if (userId && customerId) {
-        await supabaseAdmin
-          .from('profiles')
-          .update({ stripe_customer_id: customerId })
-          .eq('id', userId)
-      }
-    }
-
-    // 3. Handle Subscription Updates (Renewals, Cancellations, Status changes)
-    if (
-      event.type === 'customer.subscription.created' ||
-      event.type === 'customer.subscription.updated' ||
-      event.type === 'customer.subscription.deleted'
-    ) {
-      const subscription = event.data.object
-
-      // First, find out WHICH user this subscription belongs to based on the Stripe customer ID
       const { data: profile } = await supabaseAdmin
         .from('profiles')
         .select('id')
-        .eq('stripe_customer_id', subscription.customer)
+        .eq('stripe_customer_id', sub.customer)
         .single()
 
-      if (profile) {
-        const planType = subscription.items.data[0].plan.interval === 'month' ? 'monthly' : 'yearly'
-        
-        // Save the current state to the subscriptions table!
-        await supabaseAdmin
-          .from('subscriptions')
-          .upsert({
-            id: subscription.id,
-            user_id: profile.id,
-            status: subscription.status,
-            plan_type: planType,
-            current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-            cancel_at_period_end: subscription.cancel_at_period_end,
-          })
-      }
+      if (profile) userId = profile.id
     }
 
-    return NextResponse.json({ received: true })
-  } catch (error) {
-    console.error('Webhook handler failed:', error)
-    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 })
+    if (!userId) {
+      console.error('⚠️ No user found for subscription')
+    } else {
+      const planType =
+        sub.items.data[0].plan.interval === 'month'
+          ? 'monthly'
+          : 'yearly'
+
+      const { error } = await supabaseAdmin
+        .from('subscriptions')
+        .upsert({
+          id: sub.id,
+          user_id: userId,
+          status: sub.status,
+          plan_type: planType,
+          current_period_start: new Date(
+            sub.current_period_start * 1000
+          ).toISOString(),
+          current_period_end: new Date(
+            sub.current_period_end * 1000
+          ).toISOString(),
+          cancel_at_period_end: sub.cancel_at_period_end,
+        })
+
+      if (error) {
+        console.error('❌ Subscription upsert failed:', error.message)
+      }
+    }
   }
->>>>>>> 439dc91c3d863ceacfe4d48f68c76629aefb2f4c
+
+  return NextResponse.json({ received: true })
 }
