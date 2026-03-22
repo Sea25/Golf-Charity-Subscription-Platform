@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { stripe } from '@/utils/stripe/server'
+import { getStripe } from '@/utils/stripe/server'
 import { supabaseAdmin } from '@/utils/supabase/admin'
 
 // Ensure a profile row exists - auto-create from auth if trigger missed it
@@ -95,6 +95,8 @@ async function upsertSubscription(sub, userId) {
 }
 
 export async function POST(req) {
+  const stripe = getStripe() // ← lazy, only runs at request time
+
   const body = await req.text()
   const sig = req.headers.get('stripe-signature')
 
@@ -120,10 +122,8 @@ export async function POST(req) {
     const customerId = session.customer
 
     if (userId && customerId) {
-      // Ensure profile exists FIRST
       await ensureProfile(userId)
 
-      // Link Stripe customer ID to profile
       const { error } = await supabaseAdmin
         .from('profiles')
         .update({ stripe_customer_id: customerId })
@@ -135,7 +135,6 @@ export async function POST(req) {
         console.log(`✅ Linked Stripe customer ${customerId} to user ${userId}`)
       }
 
-      // Upsert the subscription
       if (session.subscription) {
         try {
           const sub = await stripe.subscriptions.retrieve(session.subscription)
@@ -156,11 +155,8 @@ export async function POST(req) {
     event.type === 'customer.subscription.deleted'
   ) {
     const sub = event.data.object
-
-    // Try metadata first
     let userId = sub.metadata?.userId
 
-    // Fall back to looking up by Stripe customer ID
     if (!userId) {
       const { data: profile } = await supabaseAdmin
         .from('profiles')

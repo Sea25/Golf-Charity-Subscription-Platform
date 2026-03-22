@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
-import { stripe } from '@/utils/stripe/server'
+import { getStripe } from '@/utils/stripe/server'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 
@@ -34,6 +34,8 @@ export async function createCheckoutSession(formData) {
     process.env.NEXT_PUBLIC_SITE_URL ||
     'http://localhost:3000'
 
+  const stripe = getStripe() // ← lazy, only runs at request time
+
   let session
 
   try {
@@ -49,13 +51,11 @@ export async function createCheckoutSession(formData) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: `Impact Golf - ${planType.charAt(0).toUpperCase() + planType.slice(1)} Subscription`,
-              description: 'Access to Monthly Draws and Game Tracking',
+              name: `Impact Golf — ${planType.charAt(0).toUpperCase() + planType.slice(1)} Subscription`,
+              description: 'Access to Monthly Draws and Score Tracking',
             },
             unit_amount: unitAmount,
-            recurring: {
-              interval: interval,
-            },
+            recurring: { interval },
           },
           quantity: 1,
         },
@@ -65,10 +65,10 @@ export async function createCheckoutSession(formData) {
     })
   } catch (error) {
     console.error('Stripe Error:', error)
-    redirect('/subscribe?error=Could not create checkout session')
+    redirect('/subscribe?error=Could+not+create+checkout+session')
   }
 
-  if (session.url) {
+  if (session?.url) {
     redirect(session.url)
   }
 }
